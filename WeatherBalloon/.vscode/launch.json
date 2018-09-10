@@ -1,0 +1,97 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "GPSModule Remote Debug (Python)",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "localhost",
+      "logToFile": true,
+      "redirectOutput": true,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/modules/GPSModule",
+          "remoteRoot": "/app"
+        }
+      ],
+      "windows": {
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}\\modules\\GPSModule",
+            "remoteRoot": "/app"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IngestionModule Remote Debug (Python)",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "localhost",
+      "logToFile": true,
+      "redirectOutput": true,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/modules/IngestionModule",
+          "remoteRoot": "/app"
+        }
+      ],
+      "windows": {
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}\\modules\\IngestionModule",
+            "remoteRoot": "/app"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataIngestionFunction Remote Debug (.NET Core)",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickRemoteProcess}",
+      "pipeTransport": {
+        "pipeProgram": "docker",
+        "pipeArgs": [
+          "exec",
+          "-i",
+          "DataIngestionFunction",
+          "sh",
+          "-c"
+        ],
+        "debuggerPath": "~/vsdbg/vsdbg",
+        "pipeCwd": "${workspaceFolder}",
+        "quoteArgs": true
+      },
+      "sourceFileMap": {
+        "/app": "${workspaceFolder}/modules/DataIngestionFunction"
+      },
+      "justMyCode": true
+    },
+    {
+      "name": "DataIngestionModule Remote Debug (Python)",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "localhost",
+      "logToFile": true,
+      "redirectOutput": true,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/modules/DataIngestionModule",
+          "remoteRoot": "/app"
+        }
+      ],
+      "windows": {
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}\\modules\\DataIngestionModule",
+            "remoteRoot": "/app"
+          }
+        ]
+      }
+    }
+  ]
+}
