@@ -2,7 +2,7 @@ using System;
 
 namespace PredictionModule.Models
 {
-    public class PredictionResponse 
+    public class HabHubPredictionResponse 
     {
         public string valid { get; set; }
         public string uuid { get; set; }
