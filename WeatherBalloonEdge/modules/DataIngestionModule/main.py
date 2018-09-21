@@ -85,6 +85,9 @@ def ingest():
     print ( json.dumps(requestBody) )
 
     message = IoTHubMessage(json.dumps(requestBody))
+
+    prop_map = message.properties()
+    prop_map.add('type', 'telemetry')
     
     try:
         global hub_manager

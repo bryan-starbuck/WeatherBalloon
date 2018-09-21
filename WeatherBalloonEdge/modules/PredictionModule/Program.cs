@@ -20,6 +20,13 @@ namespace PredictionModule
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
+        // Launch parameters
+        private static DateTime launchTime = DateTime.Now;
+        private static float burstAltitude = 100F;
+        private static float launchLatitude = 0.0F;
+        private static float launchLongitude = 0.0F;
+        private static float launchAltitude = 0.0F;
+
         // for time conversion
         private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -80,18 +87,21 @@ namespace PredictionModule
             string messageString = Encoding.UTF8.GetString(messageBytes);
             Console.WriteLine($"Received message. Body: [{messageString}]");
 
-            if (!string.IsNullOrEmpty(messageString))
+            if (!string.IsNullOrEmpty(messageString)) //&& message.Properties["type"] == "telemetry")
             {
-                var balloonMessage = JsonConvert.DeserializeObject<BalloonMessage>(messageString);
+                //var telemetryMessage = JsonConvert.DeserializeObject<TelemetryMessage>(messageString);
 
-                var predictionMessage = await GetPrediction(balloonMessage);
+                //var predictionMessage = await GetPrediction(telemetryMessage);
+
+                var predictionMessage = GetMockPrediction();
 
                 var predictionMessageString = JsonConvert.SerializeObject(predictionMessage);
 
                 var predictionMessageBytes = Encoding.UTF8.GetBytes(predictionMessageString);
 
                 var iotEdgePredictionMessage = new Message(predictionMessageBytes);
-                
+                iotEdgePredictionMessage.Properties.Add("type", "prediction");
+
                 await moduleClient.SendEventAsync("predictionOutput", iotEdgePredictionMessage);
 
                 Console.WriteLine("Received message sent");
@@ -105,7 +115,23 @@ namespace PredictionModule
             return epoch.AddSeconds(unixTime);
         }
 
-        private static async Task<PredictionMessage> GetPrediction (BalloonMessage balloonMessage)
+        private static PredictionMessage GetMockPrediction ()
+        {
+            // MOCK RESPONSE 
+
+            var testMessage = new PredictionMessage()
+            {
+                Type = "prediction",
+                PredictionDate = DateTime.UtcNow,
+                LandingDateTime = DateTime.UtcNow.AddHours(2),
+                LandingLat = 0.0F,
+                LandingLong = 0.0F
+            };
+
+            return testMessage;
+        }
+
+        private static async Task<PredictionMessage> GetPrediction (TelemetryMessage telemetryMessage)
         {
             // example post data
             // lat=52.2135&lon=0.0964&initial_alt=0&hour=00&min=00&second=0&day=19&month=9&year=2018&ascent=2.33&burst=33000&drag=5&submit=Run+Prediction
@@ -113,18 +139,18 @@ namespace PredictionModule
             var postValues = new Dictionary<string, string>
             {
                 { "action","submitForm"},
-                { "lat",  balloonMessage.LaunchLat.ToString()},
-                { "lon",  balloonMessage.LaunchLong.ToString()},
-                { "initial_alt", balloonMessage.LaunchAltitude.ToString()}, 
-                { "hour", balloonMessage.LaunchTime.Hour.ToString()}, 
-                { "min", balloonMessage.LaunchTime.Minute.ToString()}, 
-                { "second", balloonMessage.LaunchTime.Second.ToString()},
-                { "day", balloonMessage.LaunchTime.Day.ToString()},
-                { "month", balloonMessage.LaunchTime.Month.ToString()}, 
-                { "year", balloonMessage.LaunchTime.Year.ToString()},
-                { "ascent", balloonMessage.AscentRate.ToString()},
-                { "drag", balloonMessage.DescentRate.ToString()},
-                { "burst", balloonMessage.BurstAltitude.ToString()},
+                { "lat",  launchLatitude.ToString()},
+                { "lon",  launchLongitude.ToString()},
+                { "initial_alt", launchAltitude.ToString()}, 
+                { "hour", launchTime.Hour.ToString()}, 
+                { "min", launchTime.Minute.ToString()}, 
+                { "second", launchTime.Second.ToString()},
+                { "day", launchTime.Day.ToString()},
+                { "month", launchTime.Month.ToString()}, 
+                { "year", launchTime.Year.ToString()},
+                { "ascent", telemetryMessage.ascentAve.ToString()},
+                { "drag", telemetryMessage.descentAve.ToString()},
+                { "burst", burstAltitude.ToString()},
                 { "submit", "Run Prediction"}
             };
 
