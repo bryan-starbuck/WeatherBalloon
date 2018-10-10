@@ -19,4 +19,41 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="RFMLib">
+      <HintPath>binaries\RFMLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Raspberry.IO">
+      <HintPath>binaries\Raspberry.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Raspberry.IO.Components">
+      <HintPath>binaries\Raspberry.IO.Components.dll</HintPath>
+    </Reference>
+    <Reference Include="Raspberry.IO.GeneralPurpose">
+      <HintPath>binaries\Raspberry.IO.GeneralPurpose.dll</HintPath>
+    </Reference>
+    <Reference Include="Raspberry.IO.InterIntegratedCircuit">
+      <HintPath>binaries\Raspberry.IO.InterIntegratedCircuit.dll</HintPath>
+    </Reference>
+    <Reference Include="Raspberry.IO.Interop">
+      <HintPath>binaries\Raspberry.IO.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Raspberry.IO.SerialPeripheralInterface">
+      <HintPath>binaries\Raspberry.IO.SerialPeripheralInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="Raspberry.System">
+      <HintPath>binaries\Raspberry.System.dll</HintPath>
+    </Reference>
+
+
+    <Reference Include="Common.Logging">
+      <HintPath>..\..\utility\binaries\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Core">
+      <HintPath>..\..\utility\binaries\Common.Logging.Core.dll</HintPath>
+    </Reference>
+
+
+  </ItemGroup>
 </Project>

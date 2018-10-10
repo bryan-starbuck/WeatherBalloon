@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp", "ChatApp\ChatApp.csproj", "{57A904CD-7D88-475A-B1DF-05435102CAE0}"
 EndProject
@@ -28,6 +28,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleTransmitter", "SimpleTransmitter\SimpleTransmitter.csproj", "{9AE9E3EC-FE80-424E-8243-59ECE29E8FF5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleReciever", "SimpleReciever\SimpleReciever.csproj", "{D1676E4A-16FE-46DF-A20C-704130A4A52C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RaspberrySharp.Core", "RaspberrySharp.Core", "{CB00E203-C2F5-47E3-91A2-7A5CC3F4A2CA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raspberry.IO.Core", "RaspberrySharp.Core\Raspberry.IO.Core\Raspberry.IO.Core.csproj", "{87D86CA6-13DA-4C0E-BEBA-60AE585BEA12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raspberry.IO.Components.Standard", "RaspberrySharp.Core\Raspberry.IO.Components.Standard\Raspberry.IO.Components.Standard.csproj", "{F2489EBA-8AAE-4F8A-8EC3-3143F7921169}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +81,14 @@ Global
 		{D1676E4A-16FE-46DF-A20C-704130A4A52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1676E4A-16FE-46DF-A20C-704130A4A52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1676E4A-16FE-46DF-A20C-704130A4A52C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87D86CA6-13DA-4C0E-BEBA-60AE585BEA12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87D86CA6-13DA-4C0E-BEBA-60AE585BEA12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87D86CA6-13DA-4C0E-BEBA-60AE585BEA12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87D86CA6-13DA-4C0E-BEBA-60AE585BEA12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2489EBA-8AAE-4F8A-8EC3-3143F7921169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2489EBA-8AAE-4F8A-8EC3-3143F7921169}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2489EBA-8AAE-4F8A-8EC3-3143F7921169}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2489EBA-8AAE-4F8A-8EC3-3143F7921169}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,5 +105,11 @@ Global
 		{6CBDB659-8698-45F6-9679-B18B846C8502} = {C948D199-9EA4-460D-8849-D007188B810C}
 		{9AE9E3EC-FE80-424E-8243-59ECE29E8FF5} = {1AF6C113-F66F-4CAE-8D82-04BC69E1D94B}
 		{D1676E4A-16FE-46DF-A20C-704130A4A52C} = {1AF6C113-F66F-4CAE-8D82-04BC69E1D94B}
+		{CB00E203-C2F5-47E3-91A2-7A5CC3F4A2CA} = {C948D199-9EA4-460D-8849-D007188B810C}
+		{87D86CA6-13DA-4C0E-BEBA-60AE585BEA12} = {CB00E203-C2F5-47E3-91A2-7A5CC3F4A2CA}
+		{F2489EBA-8AAE-4F8A-8EC3-3143F7921169} = {CB00E203-C2F5-47E3-91A2-7A5CC3F4A2CA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D960958-47B8-49C9-832E-3E5B27ED8E8D}
 	EndGlobalSection
 EndGlobal
