@@ -41,23 +41,13 @@
           }
         },
         "modules": {
-          "tempSensor": {
+          "BalloonModule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0",
-              "createOptions": ""
-            }
-          },
-          "GPSModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.GPSModule.amd64}",
+              "image": "${MODULES.BalloonModule.arm32v7}",
               "createOptions": ""
             }
           },
@@ -67,57 +57,17 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.IngestionModule.amd64}",
+              "image": "${MODULES.IngestionModule.arm32v7}",
               "createOptions": ""
             }
           },
-          "DataIngestionFunction": {
+          "LoraModule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.DataIngestionFunction.amd64}",
-              "createOptions": ""
-            }
-          },
-          "DataIngestionModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.DataIngestionModule.amd64}",
-              "createOptions": ""
-            }
-          },
-          "PredictionModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.PredictionModule.amd64}",
-              "createOptions": ""
-            }
-          },
-          "LoraTransmitterModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.LoraTransmitterModule.amd64}",
-              "createOptions": ""
-            }
-          },
-          "LoraReceiverModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.LoraReceiverModule.amd64}",
+              "image": "${MODULES.LoraModule.arm32v7}",
               "createOptions": ""
             }
           }
@@ -128,13 +78,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "GPSModuleToIoTHub": "FROM /messages/modules/GPSModule/outputs/* INTO $upstream",
-          "IngestionModuleToIoTHub": "FROM /messages/modules/IngestionModule/outputs/* INTO $upstream",
-          "DataIngestionFunctionToIoTHub": "FROM /messages/modules/DataIngestionFunction/outputs/* INTO $upstream",
-          "DataIngestionModuleToIoTHub": "FROM /messages/modules/DataIngestionModule/outputs/* INTO $upstream",
-          "PredictionModuleToIoTHub": "FROM /messages/modules/PredictionModule/outputs/* INTO $upstream",
-          "LoraTransmitterModuleToIoTHub": "FROM /messages/modules/LoraTransmitterModule/outputs/* INTO $upstream",
-          "LoraReceiverModuleToIoTHub": "FROM /messages/modules/LoraReceiverModule/outputs/* INTO $upstream"
+          "DataIngestionModuleToIoTHub": "FROM /messages/modules/IngestionModule/outputs/output INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
