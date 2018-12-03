@@ -1,0 +1,6 @@
+{
+    "HostConfig": 
+    { 
+        "Privileged": true
+    }
+}

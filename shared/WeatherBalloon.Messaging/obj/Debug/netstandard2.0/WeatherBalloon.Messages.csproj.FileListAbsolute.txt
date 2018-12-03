@@ -1,0 +1,9 @@
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\obj\Debug\netstandard2.0\WeatherBalloon.Messages.csprojAssemblyReference.cache
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\obj\Debug\netstandard2.0\WeatherBalloon.Messages.csproj.CoreCompileInputs.cache
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\obj\Debug\netstandard2.0\WeatherBalloon.Messages.AssemblyInfoInputs.cache
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\obj\Debug\netstandard2.0\WeatherBalloon.Messages.AssemblyInfo.cs
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\bin\Debug\netstandard2.0\WeatherBalloon.Messages.deps.json
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\bin\Debug\netstandard2.0\WeatherBalloon.Messages.dll
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\bin\Debug\netstandard2.0\WeatherBalloon.Messages.pdb
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\obj\Debug\netstandard2.0\WeatherBalloon.Messages.dll
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\obj\Debug\netstandard2.0\WeatherBalloon.Messages.pdb
