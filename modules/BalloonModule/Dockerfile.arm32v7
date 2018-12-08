@@ -2,8 +2,7 @@ FROM microsoft/dotnet:2.1-runtime-stretch-slim-arm32v7
 WORKDIR /app
 COPY bin/Debug/netcoreapp2.1/publish ./
 
-RUN apt-get -y update
-RUN apt-get -y install qemu qemu-user-static binfmt-support
+FROM resin/rpi-raspbian
 
 RUN useradd -ms /bin/bash moduleuser
 USER moduleuser
