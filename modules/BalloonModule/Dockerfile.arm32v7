@@ -2,6 +2,8 @@ FROM microsoft/dotnet:2.1-runtime-stretch-slim-arm32v7
 WORKDIR /app
 COPY bin/Debug/netcoreapp2.1/publish ./
 
+RUN apt-get install qemu qemu-user-static binfmt-support
+
 RUN useradd -ms /bin/bash moduleuser
 USER moduleuser
 
