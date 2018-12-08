@@ -1,0 +1,14 @@
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\xunit.runner.reporters.netcoreapp10.dll
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\xunit.runner.utility.netcoreapp10.dll
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\LoraModule.Test.deps.json
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\LoraModule.Test.runtimeconfig.json
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\LoraModule.Test.runtimeconfig.dev.json
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\LoraModule.Test.dll
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\bin\Debug\netcoreapp2.1\LoraModule.Test.pdb
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\obj\Debug\netcoreapp2.1\LoraModule.Test.csprojAssemblyReference.cache
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\obj\Debug\netcoreapp2.1\LoraModule.Test.csproj.CoreCompileInputs.cache
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\obj\Debug\netcoreapp2.1\LoraModule.Test.AssemblyInfoInputs.cache
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\obj\Debug\netcoreapp2.1\LoraModule.Test.AssemblyInfo.cs
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\obj\Debug\netcoreapp2.1\LoraModule.Test.dll
+D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\tests\LoraModule.Test\obj\Debug\netcoreapp2.1\LoraModule.Test.pdb

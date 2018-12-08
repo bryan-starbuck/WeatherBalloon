@@ -182,9 +182,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\shared\\WeatherBalloon.Messaging\\WeatherBalloon.Messages.csproj",
-      "projectName": "WeatherBalloon.Messages",
-      "projectPath": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\shared\\WeatherBalloon.Messaging\\WeatherBalloon.Messages.csproj",
+      "projectUniqueName": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\shared\\WeatherBalloon.Messaging\\WeatherBalloon.Messaging.csproj",
+      "projectName": "WeatherBalloon.Messaging",
+      "projectPath": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\shared\\WeatherBalloon.Messaging\\WeatherBalloon.Messaging.csproj",
       "packagesPath": "C:\\Users\\Bryan\\.nuget\\packages\\",
       "outputPath": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\shared\\WeatherBalloon.Messaging\\obj\\",
       "projectStyle": "PackageReference",

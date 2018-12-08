@@ -11,8 +11,8 @@ namespace WeatherBalloon.BalloonModule
 
         private double burstAltitude = 0.0;
 
-        private int ascentDataPoints = 0;
-        private int descentDataPoints = 0;
+        //private int ascentDataPoints = 0;
+        //private int descentDataPoints = 0;
 
         private GPSLocation location;
 
@@ -31,7 +31,7 @@ namespace WeatherBalloon.BalloonModule
         /// <param name="message"></param>
         public void Receive(GPSMessage message)
         {
-            currentLocation = message.Location;
+            location = message.Location;
 
             // update average ascent/descent rate and burst detetection
 
