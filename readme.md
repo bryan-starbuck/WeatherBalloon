@@ -2,6 +2,8 @@
 
 The goal is to collect telemetry from the weather balloon at altitude via Long Range Radio (Lora) to trackers on the ground.  The tracker devices will then send the messages to the Azure cloud where it will be used to predict where the balloon will land.
 
+[![Build status](https://starbuckdevops.visualstudio.com/WeatherBalloon/_apis/build/status/BalloonEdge-CI)](https://starbuckdevops.visualstudio.com/WeatherBalloon/_build/latest?definitionId=5)
+
 Technology:
 - IoT Edge
 - Python
