@@ -50,16 +50,6 @@
               "image": "${MODULES.BalloonModule.arm32v7}",
               "createOptions": ""
             }
-          },
-          "LoraModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.LoraModule.arm32v7}",
-              "createOptions": ""
-            }
           }
         }
       }
