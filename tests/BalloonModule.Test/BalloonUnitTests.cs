@@ -1,18 +1,35 @@
 using System;
 using Xunit;
+using Shouldly;
 
 using WeatherBalloon.Messaging;
 using WeatherBalloon.BalloonModule;
+
+
 
 namespace BalloonModule.Test
 {
     public class BalloonUnitTests
     {
         [Fact]
-        public void ReceiveGPSMessage()
+        public void ReceiveGPSMessageTest()
         {
+            // arrange
+            var gpsMessage = CreateGPSMessage();
 
+            var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
+            
+            // act 
+            balloonModule.Receive(gpsMessage);
 
+            // verify
+            balloonModule.Location.track.ShouldBe(gpsMessage.Location.track);
+            balloonModule.Location.@long.ShouldBe(gpsMessage.Location.@long);
+            balloonModule.Location.lat.ShouldBe(gpsMessage.Location.lat);
+            balloonModule.Location.mode.ShouldBe(gpsMessage.Location.mode);
+            balloonModule.Location.time.ShouldBe(gpsMessage.Location.time);
+            balloonModule.Location.speed.ShouldBe(gpsMessage.Location.speed);
+            balloonModule.Location.climb.ShouldBe(gpsMessage.Location.climb);
         }
 
 
@@ -22,7 +39,15 @@ namespace BalloonModule.Test
 
             return new GPSMessage()
             {
-
+                Location = new GPSLocation() { 
+                    track = random.NextDouble(),
+                    @long = random.NextDouble(),
+                    lat = random.NextDouble(),
+                    mode = 0, 
+                    time = DateTime.UtcNow.ToString(),
+                    speed = random.NextDouble(), 
+                    climb = random.NextDouble()
+                }
             };
         }
     }
