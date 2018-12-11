@@ -4,17 +4,17 @@ namespace WeatherBalloon.BalloonModule
 {
     public class BalloonModule
     {
-        private double averageAscent = 0.0;
-        private double averageDescent = 0.0;
+        public double AverageAscent = 0.0;
+        public double AverageDescent = 0.0;
 
-        private bool burstDetected = false;
+        public bool BurstDetected = false;
 
-        private double burstAltitude = 0.0;
+        public  double BurstAltitude = 0.0;
 
         //private int ascentDataPoints = 0;
         //private int descentDataPoints = 0;
 
-        private GPSLocation location;
+        public GPSLocation Location;
 
         /// <summary>
         /// Constructor - TODO - default values?
@@ -31,7 +31,7 @@ namespace WeatherBalloon.BalloonModule
         /// <param name="message"></param>
         public void Receive(GPSMessage message)
         {
-            location = message.Location;
+            Location = message.Location;
 
             // update average ascent/descent rate and burst detetection
 
@@ -47,11 +47,11 @@ namespace WeatherBalloon.BalloonModule
         {
             return new BalloonMessage()
             {
-                Location = location, 
-                AveAscent = averageAscent,
-                AveDescent = averageDescent,
-                BurstDetected = burstDetected,
-                BurstAltitude = burstAltitude 
+                Location = Location, 
+                AveAscent = AverageAscent,
+                AveDescent = AverageDescent,
+                BurstDetected = BurstDetected,
+                BurstAltitude = BurstAltitude 
             };
         }
 
