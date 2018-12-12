@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <RH_RF69.h>
 #include <RH_RF95.h>
@@ -44,31 +45,23 @@
 #include "../RasPiBoards.h"
 
 // Our RFM95 Configuration 
-#define RF_FREQUENCY  868.00
+#define RF_FREQUENCY  915.0
 #define RF_GATEWAY_ID 1 
 #define RF_NODE_ID    10
+
+#define RF_CS_PIN 7
+#define RF_IRQ_PIN 16
 
 // Create an instance of a driver
 RH_RF95 rf95(RF_CS_PIN, RF_IRQ_PIN);
 //RH_RF95 rf95(RF_CS_PIN);
 
-//Flag for Ctrl-C
-volatile sig_atomic_t force_exit = false;
-
-void sig_handler(int sig)
-{
-  printf("\n%s Break received, exiting!\n", __BASEFILE__);
-  force_exit=true;
-}
-
 //Main Function
 int main (int argc, const char* argv[] )
 {
-  static unsigned long last_millis;
-  static unsigned long led_blink = 0;
-  
-  signal(SIGINT, sig_handler);
-  printf( "%s\n", __BASEFILE__);
+  if (argc != 2)
+    return -1;
+
 
   if (!bcm2835_init()) {
     fprintf( stderr, "%s bcm2835_init() Failed\n\n", __BASEFILE__ );
@@ -151,64 +144,26 @@ int main (int argc, const char* argv[] )
 
     printf("RF95 node #%d init OK @ %3.2fMHz\n", RF_NODE_ID, RF_FREQUENCY );
 
-    last_millis = millis();
-
-    //Begin the main body of code
-    while (!force_exit) {
-
-      //printf( "millis()=%ld last=%ld diff=%ld\n", millis() , last_millis,  millis() - last_millis );
-
-      // Send every 5 seconds
-      if ( millis() - last_millis > 5000 ) {
-        last_millis = millis();
-
 #ifdef RF_LED_PIN
-        led_blink = millis();
-        digitalWrite(RF_LED_PIN, HIGH);
+    digitalWrite(RF_LED_PIN, HIGH);
 #endif
         
-        // Send a message to rf95_server
-        uint8_t data[] = "Hi Raspi!";
-        uint8_t len = sizeof(data);
-        
-        printf("Sending %02d bytes to node #%d => ", len, RF_GATEWAY_ID );
-        printbuffer(data, len);
-        printf("\n" );
-        rf95.send(data, len);
-        rf95.waitPacketSent();
-/*
-        // Now wait for a reply
-        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-        uint8_t len = sizeof(buf);
+    // Send a message to rf95_server
+//    uint8_t * data;
+//    data = argv[1];
+//    uint8_t len = sizeof(argv[1]);
+    
+    char buffer[2048] = {0};
 
-        if (rf95.waitAvailableTimeout(1000)) { 
-          // Should be a reply message for us now   
-          if (rf95.recv(buf, &len)) {
-            printf("got reply: ");
-            printbuffer(buf,len);
-            printf("\nRSSI: %d\n", rf95.lastRssi());
-          } else {
-            printf("recv failed");
-          }
-        } else {
-          printf("No reply, is rf95_server running?\n");
-        }
-*/
-        
-      }
-
-#ifdef RF_LED_PIN
-      // Led blink timer expiration ?
-      if (led_blink && millis()-led_blink>200) {
-        led_blink = 0;
-        digitalWrite(RF_LED_PIN, LOW);
-      }
-#endif
-      
-      // Let OS doing other tasks
-      // Since we do nothing until each 5 sec
-      bcm2835_delay(100);
+    for (int x = 1; x< argc; x++)
+    {
+        strcat(buffer,argv[x]);
     }
+
+    //printbuffer(data, len);
+    printf("\n" );
+    rf95.send((const uint8_t*)(buffer), strlen(buffer));
+    rf95.waitPacketSent();  
   }
 
 #ifdef RF_LED_PIN

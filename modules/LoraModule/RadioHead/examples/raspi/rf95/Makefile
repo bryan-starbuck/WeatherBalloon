@@ -5,11 +5,12 @@
 
 CC            = g++
 CFLAGS        = -DRASPBERRY_PI -DBCM2835_NO_DELAY_COMPATIBILITY -D__BASEFILE__=\"$*\"
+LDFLAGS       = -shared -fPIC
 LIBS          = -lbcm2835
 RADIOHEADBASE = ../../..
 INCLUDE       = -I$(RADIOHEADBASE)
 
-all: rf95_client rf95_server
+all: rf95_client rf95_server rf95_lib.so
 
 RasPi.o: $(RADIOHEADBASE)/RHutil/RasPi.cpp
 				$(CC) $(CFLAGS) -c $(RADIOHEADBASE)/RHutil/RasPi.cpp $(INCLUDE)
@@ -18,6 +19,9 @@ rf95_client.o: rf95_client.cpp
 				$(CC) $(CFLAGS) -c $(INCLUDE) $<
 
 rf95_server.o: rf95_server.cpp
+				$(CC) $(CFLAGS) -c $(INCLUDE) $<
+
+rf95_lib.o: rf95_lib.cpp
 				$(CC) $(CFLAGS) -c $(INCLUDE) $<
 
 RH_RF95.o: $(RADIOHEADBASE)/RH_RF95.cpp
@@ -43,6 +47,9 @@ rf95_client: rf95_client.o RH_RF95.o RasPi.o RHHardwareSPI.o RHGenericDriver.o R
 
 rf95_server: rf95_server.o RH_RF95.o RasPi.o RHHardwareSPI.o RHGenericDriver.o RHGenericSPI.o RHSPIDriver.o
 				$(CC) $^ $(LIBS) -o rf95_server
+
+rf95_lib.so: rf95_lib.o RH_RF95.o RasPi.o RHHardwareSPI.o RHGenericDriver.o RHGenericSPI.o RHSPIDriver.o
+				$(CC) $^ $(LIBS) $(LDFLAGS) -o  rf95_lib.so
 
 clean:
 				rm -rf *.o rf95_client rf95_server
