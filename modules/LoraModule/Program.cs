@@ -146,8 +146,10 @@ namespace WeatherBalloon.LoraModule
             {
                 try 
                 {
-                    RF95_Client.Transmit(messageString);
-                    Console.WriteLine("Transmit complete.");
+                    await Task.Run( () =>  {
+                        RF95_Client.Transmit(messageString);
+                        Console.WriteLine("Transmit complete.");
+                    });
                 }
                 catch (Exception ex)
                 {

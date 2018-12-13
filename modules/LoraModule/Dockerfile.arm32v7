@@ -1,15 +1,11 @@
-FROM microsoft/dotnet:2.1-sdk AS build-env
-WORKDIR /app
-
-COPY *.csproj ./
-RUN dotnet restore
-
-COPY . ./
-RUN dotnet publish -c Release -o out
+# for QEMU support - TODO there is probably a smaller way to do this.
+FROM resin/rpi-raspbian
 
 FROM microsoft/dotnet:2.1-runtime-stretch-slim-arm32v7
+
+# expect dotnet publish to be run outside the dockerfile.
 WORKDIR /app
-COPY --from=build-env /app/out ./
+COPY bin/Debug/netcoreapp2.1/publish ./
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake gcc g++ make && \
