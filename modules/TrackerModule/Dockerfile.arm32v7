@@ -1,3 +1,5 @@
+FROM resin/rpi-raspbian
+
 FROM microsoft/dotnet:2.1-runtime-stretch-slim-arm32v7
 WORKDIR /app
 COPY bin/Debug/netcoreapp2.1/publish ./
