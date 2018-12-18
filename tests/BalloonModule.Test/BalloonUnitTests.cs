@@ -1,7 +1,9 @@
 using System;
 using Xunit;
 using Shouldly;
+using FakeItEasy;
 
+using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
 using WeatherBalloon.BalloonModule;
 
@@ -30,6 +32,24 @@ namespace BalloonModule.Test
             balloonModule.Location.time.ShouldBe(gpsMessage.Location.time);
             balloonModule.Location.speed.ShouldBe(gpsMessage.Location.speed);
             balloonModule.Location.climb.ShouldBe(gpsMessage.Location.climb);
+        }
+
+        [Fact]
+        public void TransmitGPSMessageTest()
+        {
+            // arrange
+            var fakeModuleClient = A.Fake<IModuleClient>();
+
+            var gpsMessage = CreateGPSMessage();
+            
+            var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
+
+
+            // act
+            balloonModule.Receive(gpsMessage);
+            balloonModule.Transmit(fakeModuleClient);
+
+            // verify
         }
 
 
