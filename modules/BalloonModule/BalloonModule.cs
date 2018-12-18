@@ -1,9 +1,18 @@
+using Microsoft.Azure.Devices.Client;
+using Newtonsoft.Json;
+
+using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
+
+
 
 namespace WeatherBalloon.BalloonModule
 {
     public class BalloonModule
     {
+        public const string TelemetryInputName = "telemetryInput";
+        public const string BalloonOutputName = "balloonOutput";
+ 
         public double AverageAscent = 0.0;
         public double AverageDescent = 0.0;
 
@@ -13,6 +22,8 @@ namespace WeatherBalloon.BalloonModule
 
         //private int ascentDataPoints = 0;
         //private int descentDataPoints = 0;
+
+        private object lockingUpdateObject = new object();
 
         public GPSLocation Location;
 
@@ -31,19 +42,36 @@ namespace WeatherBalloon.BalloonModule
         /// <param name="message"></param>
         public void Receive(GPSMessage message)
         {
-            Location = message.Location;
+            lock (lockingUpdateObject)
+            {
+                Location = message.Location;
 
-            // update average ascent/descent rate and burst detetection
+                // update average ascent/descent rate and burst detetection
 
 
-            // todo
+                // todo
+            }
+            
         }
+
+        public async void Transmit(IModuleClient moduleClient)
+        {
+            var balloonMessage = CreateBalloonMessage();
+
+            Message message = new Message(balloonMessage.ToRawBytes());
+
+            await moduleClient.SendEventAsync(BalloonOutputName, message);
+        
+            Logger.LogInfo($"transmitted message: {JsonConvert.SerializeObject(balloonMessage)}.");
+        }
+
+
 
         /// <summary>
         /// Create a Balloon Message with the current balloon state
         /// </summary>
         /// <returns></returns>
-        public BalloonMessage CreateBalloonMessage()
+        private BalloonMessage CreateBalloonMessage()
         {
             return new BalloonMessage()
             {
@@ -54,8 +82,5 @@ namespace WeatherBalloon.BalloonModule
                 BurstAltitude = BurstAltitude 
             };
         }
-
     }
-
-
 }

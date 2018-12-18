@@ -2,6 +2,8 @@ using System;
 using Xunit;
 using Shouldly;
 using FakeItEasy;
+using System.Text;
+using Newtonsoft.Json;
 
 using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
@@ -49,9 +51,33 @@ namespace BalloonModule.Test
             balloonModule.Receive(gpsMessage);
             balloonModule.Transmit(fakeModuleClient);
 
+            //Console.WriteLine($"GPS: {JsonConvert.SerializeObject(gpsMessage)}");
+
             // verify
+            A.CallTo(() => fakeModuleClient.SendEventAsync(WeatherBalloon.BalloonModule.BalloonModule.BalloonOutputName, 
+                A<Microsoft.Azure.Devices.Client.Message>.Ignored))
+                .MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => fakeModuleClient.SendEventAsync(WeatherBalloon.BalloonModule.BalloonModule.BalloonOutputName, 
+                A<Microsoft.Azure.Devices.Client.Message>.That.Matches(msg => 
+                DeserializeBytes<BalloonMessage>(msg.GetBytes()).Location.track.Equals(gpsMessage.Location.track))))
+                .MustHaveHappened();
+            A.CallTo(() => fakeModuleClient.SendEventAsync(WeatherBalloon.BalloonModule.BalloonModule.BalloonOutputName, 
+                A<Microsoft.Azure.Devices.Client.Message>.That.Matches(msg => 
+                DeserializeBytes<BalloonMessage>(msg.GetBytes()).Location.lat.Equals(gpsMessage.Location.lat))))
+                .MustHaveHappened();     
+                
         }
 
+        private T DeserializeBytes<T>(byte[] bytes)
+        {
+            var encodedString = Encoding.UTF8.GetString(bytes);
+
+            Console.WriteLine(encodedString);
+            BalloonMessage deserialized = JsonConvert.DeserializeObject<BalloonMessage>(encodedString);
+            Console.WriteLine(deserialized.Location.track);
+
+            return JsonConvert.DeserializeObject<T>(encodedString);
+        }
 
         private GPSMessage CreateGPSMessage()
         {

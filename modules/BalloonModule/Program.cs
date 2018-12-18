@@ -7,12 +7,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
+using Newtonsoft.Json;
+
+using WeatherBalloon.Common;
+using WeatherBalloon.Messaging;
 
 namespace WeatherBalloon.BalloonModule
 {
     public class Program
     {
-        static int counter;
+        private static BalloonModule _balloonModule = new BalloonModule();
+        private static Timer _transmitTimer;
+        private const int _transmitInterval = 60000;
 
         static void Main(string[] args)
         {
@@ -50,7 +56,9 @@ namespace WeatherBalloon.BalloonModule
             Console.WriteLine("IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
-            await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", PipeMessage, ioTHubModuleClient);
+            await ioTHubModuleClient.SetInputMessageHandlerAsync("telemetry", ProcessTelemetry, ioTHubModuleClient);
+
+            _transmitTimer = new Timer(TransmitTimerCallback, new WrappedModuleClient(ioTHubModuleClient),  _transmitInterval, _transmitInterval);
         }
 
         /// <summary>
@@ -58,31 +66,38 @@ namespace WeatherBalloon.BalloonModule
         /// It just pipe the messages without any change.
         /// It prints all the incoming messages.
         /// </summary>
-        static async Task<MessageResponse> PipeMessage(Message message, object userContext)
+        static async Task<MessageResponse> ProcessTelemetry(Message message, object userContext)
         {
-            int counterValue = Interlocked.Increment(ref counter);
-
-            var moduleClient = userContext as ModuleClient;
-            if (moduleClient == null)
+            await Task.Run( () => 
             {
-                throw new InvalidOperationException("UserContext doesn't contain " + "expected values");
-            }
+                byte[] messageBytes = message.GetBytes();
+                string messageString = Encoding.UTF8.GetString(messageBytes);
 
-            byte[] messageBytes = message.GetBytes();
-            string messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"Received message: {counterValue}, Body: [{messageString}]");
-
-            if (!string.IsNullOrEmpty(messageString))
-            {
-                var pipeMessage = new Message(messageBytes);
-                foreach (var prop in message.Properties)
+                try 
                 {
-                    pipeMessage.Properties.Add(prop.Key, prop.Value);
+                    var gpsMessage = JsonConvert.DeserializeObject<GPSMessage>(messageString);
+                    _balloonModule.Receive(gpsMessage);
+                    Logger.LogInfo("GPS Message Processed.");
                 }
-                await moduleClient.SendEventAsync("output1", pipeMessage);
-                Console.WriteLine("Received message sent");
-            }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+                }
+            });
+
             return MessageResponse.Completed;
+        }
+
+        private static void TransmitTimerCallback(object state)
+        {
+            var wrappedModuleClient = state as WrappedModuleClient;
+            if ( wrappedModuleClient == null)
+            {
+                Logger.LogFatalError("Invalid Module client in Transmit Timer.");
+                return;
+            }
+
+            _balloonModule.Transmit(wrappedModuleClient);
         }
     }
 }
