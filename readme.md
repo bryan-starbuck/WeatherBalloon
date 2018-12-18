@@ -16,6 +16,7 @@ Technology:
 - PowerBi
 - Azure Logic App
 - XUnit
+- QEMU - build Raspberry Pi images in Azure [Link](http://www.hotblackrobotics.com/en/blog/2018/01/22/docker-images-arm/)
 
 # Architecture
 ![alt text](WeatherBalloon.png "Architecture")
