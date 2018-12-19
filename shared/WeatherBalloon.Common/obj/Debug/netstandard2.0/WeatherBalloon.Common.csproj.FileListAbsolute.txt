@@ -1,9 +1,0 @@
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\bin\Debug\netstandard2.0\WeatherBalloon.Common.deps.json
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\bin\Debug\netstandard2.0\WeatherBalloon.Common.dll
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\bin\Debug\netstandard2.0\WeatherBalloon.Common.pdb
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\obj\Debug\netstandard2.0\WeatherBalloon.Common.csprojAssemblyReference.cache
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\obj\Debug\netstandard2.0\WeatherBalloon.Common.csproj.CoreCompileInputs.cache
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\obj\Debug\netstandard2.0\WeatherBalloon.Common.AssemblyInfoInputs.cache
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\obj\Debug\netstandard2.0\WeatherBalloon.Common.AssemblyInfo.cs
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\obj\Debug\netstandard2.0\WeatherBalloon.Common.dll
-D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\obj\Debug\netstandard2.0\WeatherBalloon.Common.pdb

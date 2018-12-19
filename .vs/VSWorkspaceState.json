@@ -1,6 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\modules",
+    "\\modules\\BalloonModule",
+    "\\shared\\WeatherBalloon.Messaging",
+    "\\tests",
+    "\\tests\\BalloonModule.Test"
   ],
+  "SelectedNode": "\\tests\\BalloonModule.Test\\BalloonModule.Test.csproj",
   "PreviewInSolutionExplorer": false
 }
