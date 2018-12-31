@@ -21,5 +21,6 @@ namespace WeatherBalloon.Messaging
 
             return bytes;
         }
+        
     }
 }

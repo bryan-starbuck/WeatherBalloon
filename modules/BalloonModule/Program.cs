@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
 using Newtonsoft.Json;
+using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 
 using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
@@ -16,9 +17,9 @@ namespace WeatherBalloon.BalloonModule
 {
     public class Program
     {
-        private static BalloonModule _balloonModule = new BalloonModule();
-        private static Timer _transmitTimer;
-        private const int _transmitInterval = 60000;
+        private static BalloonModule balloonModule = new BalloonModule();
+        private static Timer transmitTimer;
+        private const int transmitInterval = 60000;
 
         static void Main(string[] args)
         {
@@ -47,8 +48,12 @@ namespace WeatherBalloon.BalloonModule
         /// </summary>
         static async Task Init()
         {
-            AmqpTransportSettings amqpSetting = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
-            ITransportSettings[] settings = { amqpSetting };
+            // Use Mqtt as it is more reliable than ampq 
+            MqttTransportSettings mqttSetting = new MqttTransportSettings(TransportType.Mqtt);
+            ITransportSettings[] settings = { mqttSetting };
+
+            // AmqpTransportSettings amqpSetting = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
+            // ITransportSettings[] settings = { amqpSetting };
 
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
@@ -56,27 +61,22 @@ namespace WeatherBalloon.BalloonModule
             Console.WriteLine("IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
-            await ioTHubModuleClient.SetInputMessageHandlerAsync("telemetry", ProcessTelemetry, ioTHubModuleClient);
+            await ioTHubModuleClient.SetInputMessageHandlerAsync(BalloonModule.TelemetryInputName, ProcessTelemetry, ioTHubModuleClient);
 
-            _transmitTimer = new Timer(TransmitTimerCallback, new WrappedModuleClient(ioTHubModuleClient),  _transmitInterval, _transmitInterval);
+            transmitTimer = new Timer(TransmitTimerCallback, new WrappedModuleClient(ioTHubModuleClient),  transmitInterval, transmitInterval);
         }
 
         /// <summary>
-        /// This method is called whenever the module is sent a message from the EdgeHub. 
-        /// It just pipe the messages without any change.
-        /// It prints all the incoming messages.
+        /// Process input message from the Telemetry input message source.
         /// </summary>
         static async Task<MessageResponse> ProcessTelemetry(Message message, object userContext)
         {
             await Task.Run( () => 
             {
-                byte[] messageBytes = message.GetBytes();
-                string messageString = Encoding.UTF8.GetString(messageBytes);
-
                 try 
                 {
-                    var gpsMessage = JsonConvert.DeserializeObject<GPSMessage>(messageString);
-                    _balloonModule.Receive(gpsMessage);
+                    var gpsMessage = MessageHelper.ParseMessage<GPSMessage>(message);
+                    balloonModule.Receive(gpsMessage);
                     Logger.LogInfo("GPS Message Processed.");
                 }
                 catch (Exception ex)
@@ -97,7 +97,7 @@ namespace WeatherBalloon.BalloonModule
                 return;
             }
 
-            _balloonModule.Transmit(wrappedModuleClient);
+            balloonModule.Transmit(wrappedModuleClient);
         }
     }
 }

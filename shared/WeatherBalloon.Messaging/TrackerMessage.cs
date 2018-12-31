@@ -8,6 +8,12 @@ namespace WeatherBalloon.Messaging
 
         public GPSLocation BalloonLocation {get;set;}
         public GPSLocation TrackerLocation {get;set;}
+
+        public double AveAscent {get;set;}
+        public double AveDescent {get;set;}
+        public double BurstAltitude {get;set;}
+        public BalloonState State { get;set;}
+
     }
 
 

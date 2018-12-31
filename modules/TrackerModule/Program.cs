@@ -1,18 +1,22 @@
-namespace TrackerModule
-{
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using System.Runtime.Loader;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Azure.Devices.Client;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Runtime.Loader;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 
+using WeatherBalloon.Common;
+using WeatherBalloon.Messaging;
+
+namespace WeatherBalloon.TrackerModule
+{
     class Program
     {
-        static int counter;
+        private static TrackerModule trackerModule = new TrackerModule();
 
         static void Main(string[] args)
         {
@@ -41,8 +45,12 @@ namespace TrackerModule
         /// </summary>
         static async Task Init()
         {
-            AmqpTransportSettings amqpSetting = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
-            ITransportSettings[] settings = { amqpSetting };
+            // Use Mqtt as it is more reliable than ampq 
+            MqttTransportSettings mqttSetting = new MqttTransportSettings(TransportType.Mqtt);
+            ITransportSettings[] settings = { mqttSetting };
+
+            // AmqpTransportSettings amqpSetting = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
+            // ITransportSettings[] settings = { amqpSetting };
 
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
@@ -50,39 +58,59 @@ namespace TrackerModule
             Console.WriteLine("IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
-            await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", PipeMessage, ioTHubModuleClient);
+            await ioTHubModuleClient.SetInputMessageHandlerAsync(TrackerModule.TelemetryInputName, ProcessTelemetry, ioTHubModuleClient);
+            // Register callback to be called when a message is received by the module
+            await ioTHubModuleClient.SetInputMessageHandlerAsync(TrackerModule.BalloonInputName, ProcessBalloonData, ioTHubModuleClient);
         }
 
         /// <summary>
-        /// This method is called whenever the module is sent a message from the EdgeHub. 
-        /// It just pipe the messages without any change.
-        /// It prints all the incoming messages.
+        /// Process input message from the Telemetry input message source.
         /// </summary>
-        static async Task<MessageResponse> PipeMessage(Message message, object userContext)
+        static async Task<MessageResponse> ProcessTelemetry(Message message, object userContext)
         {
-            int counterValue = Interlocked.Increment(ref counter);
-
-            var moduleClient = userContext as ModuleClient;
-            if (moduleClient == null)
+            await Task.Run( () => 
             {
-                throw new InvalidOperationException("UserContext doesn't contain " + "expected values");
-            }
-
-            byte[] messageBytes = message.GetBytes();
-            string messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"Received message: {counterValue}, Body: [{messageString}]");
-
-            if (!string.IsNullOrEmpty(messageString))
-            {
-                var pipeMessage = new Message(messageBytes);
-                foreach (var prop in message.Properties)
+                try 
                 {
-                    pipeMessage.Properties.Add(prop.Key, prop.Value);
+                    var gpsMessage = MessageHelper.ParseMessage<GPSMessage>(message);
+                    trackerModule.Receive(gpsMessage);
+                    Logger.LogInfo("GPS Message Processed.");
                 }
-                await moduleClient.SendEventAsync("output1", pipeMessage);
-                Console.WriteLine("Received message sent");
-            }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+                }
+            });
+
             return MessageResponse.Completed;
         }
+
+        /// <summary>
+        /// Process input message from the Balloon Data input message source.
+        /// </summary>
+        static async Task<MessageResponse> ProcessBalloonData(Message message, object userContext)
+        {
+            ModuleClient moduleClient = userContext as ModuleClient;
+            if (moduleClient == null)
+            {
+                throw new ArgumentException("Invalid user context in ProcessBalloonData");
+            }
+
+            WrappedModuleClient wrappedModuleClient = new WrappedModuleClient(moduleClient);    
+
+            try 
+            {
+                var balloonMessage = MessageHelper.ParseMessage<BalloonMessage>(message);
+                await trackerModule.Receive(balloonMessage, wrappedModuleClient);
+                Logger.LogInfo("Balloon Message Processed.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+            }
+            
+            return MessageResponse.Completed;
+        }
+
     }
 }
