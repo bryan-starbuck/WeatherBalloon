@@ -1,150 +1,23 @@
 {
   "version": "0.2.0",
   "configurations": [
-    
     {
-      "name": "LoraPyModule Remote Debug (Python)",
-      "type": "python",
+      "name": "Attach to Azure Functions",
+      "type": "node",
       "request": "attach",
-      "port": 5678,
-      "host": "localhost",
-      "logToFile": true,
-      "redirectOutput": true,
-      "pathMappings": [
-        {
-          "localRoot": "${workspaceFolder}/modules/LoraPyModule",
-          "remoteRoot": "/app"
-        }
-      ],
-      "windows": {
-        "pathMappings": [
-          {
-            "localRoot": "${workspaceFolder}\\modules\\LoraPyModule",
-            "remoteRoot": "/app"
-          }
-        ]
-      }
+      "port": 5858
     },
     {
-      "name": "LoraTransmitter Remote Debug (C)",
-      "type": "cppdbg",
+      "name": "Attach to Azure Functions (Java)",
+      "type": "java",
       "request": "attach",
-      "program": "./main",
-      "processId": "${command:pickRemoteProcess}",
-      "pipeTransport": {
-        "pipeCwd": "${workspaceFolder}",
-        "pipeProgram": "docker",
-        "pipeArgs": [
-          "exec",
-          "-i",
-          "LoraTransmitter",
-          "sh",
-          "-c"
-        ],
-        "debuggerPath": "/usr/bin/gdb"
-      },
-      "sourceFileMap": {
-        "/app": "${workspaceFolder}/modules/LoraTransmitter"
-      },
-      "linux": {
-        "MIMode": "gdb",
-        "setupCommands": [
-          {
-            "description": "Enable pretty-printing for gdb",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
-          }
-        ]
-      },
-      "osx": {
-        "MIMode": "lldb"
-      },
-      "windows": {
-        "MIMode": "gdb",
-        "setupCommands": [
-          {
-            "description": "Enable pretty-printing for gdb",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
-          }
-        ]
-      }
+      "port": 5005
     },
     {
-      "name": "BalloonModule Remote Debug (.NET Core)",
-      "type": "coreclr",
-      "request": "attach",
-      "processId": "${command:pickRemoteProcess}",
-      "pipeTransport": {
-        "pipeProgram": "docker",
-        "pipeArgs": [
-          "exec",
-          "-i",
-          "BalloonModule",
-          "sh",
-          "-c"
-        ],
-        "debuggerPath": "~/vsdbg/vsdbg",
-        "pipeCwd": "${workspaceFolder}",
-        "quoteArgs": true
-      },
-      "sourceFileMap": {
-        "/app": "${workspaceFolder}/modules/BalloonModule"
-      },
-      "justMyCode": true
-    },
-    {
-      "name": "BalloonModule Local Debug (.NET Core)",
-      "type": "coreclr",
-      "request": "launch",
-      "program": "${workspaceRoot}/modules/BalloonModule/bin/Debug/netcoreapp2.1/BalloonModule.dll",
-      "args": [],
-      "cwd": "${workspaceRoot}/modules/BalloonModule",
-      "internalConsoleOptions": "openOnSessionStart",
-      "stopAtEntry": false,
-      "console": "internalConsole",
-      "env": {
-        "EdgeHubConnectionString": "${config:azure-iot-edge.EdgeHubConnectionString}",
-        "EdgeModuleCACertificateFile": "${config:azure-iot-edge.EdgeModuleCACertificateFile}"
-      }
-    },
-    {
-      "name": "TrackerModule Remote Debug (.NET Core)",
-      "type": "coreclr",
-      "request": "attach",
-      "processId": "${command:pickRemoteProcess}",
-      "pipeTransport": {
-        "pipeProgram": "docker",
-        "pipeArgs": [
-          "exec",
-          "-i",
-          "TrackerModule",
-          "sh",
-          "-c"
-        ],
-        "debuggerPath": "~/vsdbg/vsdbg",
-        "pipeCwd": "${workspaceFolder}",
-        "quoteArgs": true
-      },
-      "sourceFileMap": {
-        "/app": "${workspaceFolder}/modules/TrackerModule"
-      },
-      "justMyCode": true
-    },
-    {
-      "name": "TrackerModule Local Debug (.NET Core)",
-      "type": "coreclr",
-      "request": "launch",
-      "program": "${workspaceRoot}/modules/TrackerModule/bin/Debug/netcoreapp2.1/TrackerModule.dll",
-      "args": [],
-      "cwd": "${workspaceRoot}/modules/TrackerModule",
-      "internalConsoleOptions": "openOnSessionStart",
-      "stopAtEntry": false,
-      "console": "internalConsole",
-      "env": {
-        "EdgeHubConnectionString": "${config:azure-iot-edge.EdgeHubConnectionString}",
-        "EdgeModuleCACertificateFile": "${config:azure-iot-edge.EdgeModuleCACertificateFile}"
-      }
+        "name": ".NET Core Attach",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "${command:pickProcess}"
     }
   ]
 }

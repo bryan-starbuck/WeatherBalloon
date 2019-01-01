@@ -3,18 +3,21 @@ using IoTHubTrigger = Microsoft.Azure.WebJobs.EventHubTriggerAttribute;
 using System.Text;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Documents.Client;
 using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.EventHubs;
-using Newtonsoft.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Balloon
+using System.Net;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
+
+namespace WeatherBalloon.Cloud
 {
 
     public class IoTDocument
@@ -33,6 +36,7 @@ namespace Balloon
         public double drag { get; set; }
         public string burst { get; set; }
     }
+
     public static class HubToCosmos
     {
 

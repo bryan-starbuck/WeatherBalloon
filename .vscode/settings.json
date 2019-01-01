@@ -2,5 +2,6 @@
     "python.linting.enabled": false,
     "dotnet-test-explorer.testProjectPath": "tests/BalloonModule.Test",
     "azureFunctions.projectLanguage": "C#",
-    "azureFunctions.projectRuntime": "~2"
+    "azureFunctions.projectRuntime": "~2",
+    "azureFunctions.templateFilter": "All"
 }
