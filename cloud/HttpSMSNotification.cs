@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 using WeatherBalloon.Messaging;
 
@@ -40,7 +40,6 @@ namespace WeatherBalloon.Cloud
 
             TwilioClient.Init(accountSid, authToken);
 
-            string name = req.Query["prediction"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
@@ -60,6 +59,7 @@ namespace WeatherBalloon.Cloud
                     try 
                     {
                         TransmitSMS(smsMessage, fromPhoneNumber, toPhoneNumber);
+                        log.LogInformation("Completed sending SMS.");
                     }
                     catch (Exception ex)
                     {
@@ -70,10 +70,54 @@ namespace WeatherBalloon.Cloud
             }
             catch (Exception ex)
             {
+                log.LogInformation("Bad request, could not parse prediction");
                 return new BadRequestObjectResult($"Invalid Prediction message.  Could not parse: {ex.Message}" );
             }
 
             return (ActionResult)new OkObjectResult("Complete");
+        }
+
+        [FunctionName("HttpTwilio")]
+        [return: TwilioSms(AccountSidSetting = "TwilioAccountSID", AuthTokenSetting = "TwilioAuthToken", From = "+14802970163" )]
+        public static SMSMessage Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation($"C# http trigger function processed.");
+
+            string requestBody = new StreamReader(req.Body).ReadToEnd();
+
+            try
+            {
+                var predictionMessage = JsonConvert.DeserializeObject<PredictionMessage>(requestBody);
+
+                if (predictionMessage == null)
+                {
+                    log.LogInformation("Empty Prediction message received.");
+                    return new BadRequestObjectResult("Empty prediction, no action to take.");
+                }
+
+                var smsMessage = FormatSMS(predictionMessage);
+                if (string.IsNullOrEmpty(smsMessage))
+                {
+                   var message = new Twilio.()
+            {
+                Body = $"Hello {order["name"]}, thanks for your order!",
+                To = order["mobileNumber"].ToString()
+            };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                log.LogInformation("Bad request, could not parse prediction");
+                return new BadRequestObjectResult($"Invalid Prediction message.  Could not parse: {ex.Message}" );
+            }
+
+
+            
+
+            return message;
         }
 
         /// <summary>

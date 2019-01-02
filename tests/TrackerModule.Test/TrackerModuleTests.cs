@@ -50,12 +50,11 @@ namespace TrackerModule.Test
             // verify
             fakeModuleClient.SentMessages.Count.ShouldBe(1);
 
+            // Sent on correct output?
             fakeModuleClient.SentMessages[0].Item1.ShouldBe(WeatherBalloon.TrackerModule.TrackerModule.TrackerOutputName);
             
-            // Sent on correct output?
-            var rawMessage = fakeModuleClient.SentMessages[0].Item2;
-
             // Correct message?
+            var rawMessage = fakeModuleClient.SentMessages[0].Item2;
             var trackerMessage = MessageHelper.ParseMessage<TrackerMessage>(rawMessage);
 
             // tracker location
