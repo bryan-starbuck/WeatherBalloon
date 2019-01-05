@@ -17,8 +17,8 @@ namespace TwilioSample
 
 
             // Find your Account Sid and Token at twilio.com/console
-            const string accountSid = "AC3cc1e3e385dc5c0ca8564aa6682a2cfd";
-            const string authToken = "0fd4dd6188679aefee52501b7f664c02";
+            const string accountSid = "-------------------";
+            const string authToken = "-----------";
 
             TwilioClient.Init(accountSid, authToken);
 
@@ -26,8 +26,8 @@ namespace TwilioSample
 
             var message = MessageResource.Create(
                 body: body,
-                from: new Twilio.Types.PhoneNumber("+14802970163"),
-                to: new Twilio.Types.PhoneNumber  ("+14806779336")
+                from: new Twilio.Types.PhoneNumber("------"),
+                to: new Twilio.Types.PhoneNumber  ("------")
             );
 
             Console.WriteLine(message.Sid);
