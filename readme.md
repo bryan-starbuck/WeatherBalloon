@@ -5,7 +5,7 @@ The goal is to collect telemetry from the weather balloon at altitude via Long R
 [![Build status](https://starbuckdevops.visualstudio.com/WeatherBalloon/_apis/build/status/BalloonEdge-CI)](https://starbuckdevops.visualstudio.com/WeatherBalloon/_build/latest?definitionId=5)
 
 Technology:
-- IoT Edge
+- Azure IoT Edge
 - Python
 - C# .NET Core 2.1
 - Raspberry Pi
@@ -14,8 +14,8 @@ Technology:
 - Azure Functions
 - CosmosDB
 - PowerBi
-- Azure Logic App
 - XUnit
+- Azure DevOps
 - QEMU - build Raspberry Pi images in Azure [Link](http://www.hotblackrobotics.com/en/blog/2018/01/22/docker-images-arm/)
 
 # Architecture
