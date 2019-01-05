@@ -1,0 +1,1 @@
+coverlet .\bin\Debug\netcoreapp2.1\TrackerModule.Test.dll --target "dotnet" --targetargs "test TrackerModule.Test.csproj --no-build" --format lcov --output lcov.info --include "[*Tracker*]*"

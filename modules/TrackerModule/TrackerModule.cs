@@ -82,6 +82,7 @@ namespace WeatherBalloon.TrackerModule
             }
             catch (Exception ex)
             {
+                // Todo - wire in with application insights
                 Logger.LogWarning($"Error Transmitter tracker message: {ex.Message}");
                 return false;
             }

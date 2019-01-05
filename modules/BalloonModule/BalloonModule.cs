@@ -1,5 +1,8 @@
 using Microsoft.Azure.Devices.Client;
 using Newtonsoft.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using System;
 
 using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
@@ -21,9 +24,30 @@ namespace WeatherBalloon.BalloonModule
         public const string BalloonOutputName = "balloonOutput";
  
         /// <summary>
+        /// Threshold to determine balloon is rising 
+        /// </summary>
+        public const double RiseThreshold = 0.5;  // todo validate number and units
+
+        /// <summary>
+        /// Threshold to determine balloon is falling
+        /// </summary>
+        public const double FallingThreshold = -0.5; // todo validate number and units
+
+        /// <summary>
+        /// Threshold to determine balloon is off the ground
+        /// </summary>
+        public const double GroundAltitudeThreshold = 1500; // assume on ground when lower than this value in feet
+
+        /// <summary>
+        /// Expected burst altitude
+        /// </summary>
+        public const double PredictedBurstAltitude = 90000.0; // todo validate number
+
+        /// <summary>
         /// Rate the balloon is rising since Launch detected
         /// </summary>
         public double AverageAscent = 0.0;
+
         /// <summary>
         /// Rate the balloon is falling since Burst detected
         /// </summary>
@@ -34,13 +58,7 @@ namespace WeatherBalloon.BalloonModule
         /// </summary>
         public  double BurstAltitude = PredictedBurstAltitude;
 
-        public const double RiseThreshold = 0.5;  // todo validate number
-        public const double FallingThreshold = -0.5; // todo validate number
-
-        public const double GroundAltitudeThreshold = 1500; // assume on ground when lower than this value in feet
-
-        public const double PredictedBurstAltitude = 90000.0;
-
+       
         /// <summary>
         /// Balloon State 
         /// - PreLaunch = On the Ground
@@ -55,7 +73,14 @@ namespace WeatherBalloon.BalloonModule
         /// </summary>
         public GPSLocation Location;
 
+        /// <summary>
+        /// number of data points seen with a rising climb
+        /// </summary>
         private long ascentDataPoints = 0;
+
+        /// <summary>
+        /// number of data points seen with a falling climb
+        /// </summary>
         private long descentDataPoints = 0;
 
         private object lockingUpdateObject = new object();
@@ -110,6 +135,12 @@ namespace WeatherBalloon.BalloonModule
             }
         }
 
+        /// <summary>
+        /// Determine balloon state based on latest gps location
+        /// </summary>
+        /// <param name="currentState"></param>
+        /// <param name="newLocation"></param>
+        /// <returns></returns>
         public BalloonState DetermineNewState(BalloonState currentState, GPSLocation newLocation)
         {
             BalloonState newState = currentState;
@@ -140,15 +171,31 @@ namespace WeatherBalloon.BalloonModule
             return newState;
         }
 
-        public async void Transmit(IModuleClient moduleClient)
+        /// <summary>
+        /// Transmit current balloon data
+        /// </summary>
+        /// <param name="moduleClient"></param>
+        /// <returns></returns>
+        public async Task<bool> TransmitBalloonMessage(IModuleClient moduleClient)
         {
             var balloonMessage = CreateBalloonMessage();
 
             Message message = new Message(balloonMessage.ToRawBytes());
 
-            await moduleClient.SendEventAsync(BalloonOutputName, message);
+            try 
+            {
+                await moduleClient.SendEventAsync(BalloonOutputName, message);
         
-            Logger.LogInfo($"transmitted message: {JsonConvert.SerializeObject(balloonMessage)}.");
+                Logger.LogInfo($"transmitted message: {JsonConvert.SerializeObject(balloonMessage)}.");
+            }
+            catch (Exception ex)
+            {
+                // Todo - wire in with application insights
+                Logger.LogError($"Failed to transmit balloon message. Exception: {ex.Message}");
+                return false;
+            }
+
+            return true;
         }
 
 

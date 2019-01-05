@@ -1,116 +1,124 @@
 SF:D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\modules\BalloonModule\BalloonModule.cs
-FN:76,System.Void WeatherBalloon.BalloonModule.BalloonModule::Receive(WeatherBalloon.Messaging.GPSMessage)
-FNDA:10,System.Void WeatherBalloon.BalloonModule.BalloonModule::Receive(WeatherBalloon.Messaging.GPSMessage)
-DA:77,10
-DA:78,10
-DA:79,10
-DA:80,10
-DA:82,10
-DA:84,10
-DA:85,3
-DA:87,3
-DA:88,2
-DA:89,2
-DA:91,2
-DA:92,2
-DA:94,3
-DA:95,3
-DA:96,3
-DA:99,10
-DA:100,4
-DA:101,4
-DA:102,4
-DA:104,4
-DA:105,6
-DA:106,3
-DA:107,3
-DA:108,3
-DA:109,3
-DA:110,10
-DA:111,10
-BRDA:84,65,0,3
-BRDA:87,75,0,2
-BRDA:87,75,1,1
-BRDA:87,88,0,2
-BRDA:87,88,1,3
-BRDA:84,65,1,10
-BRDA:99,174,0,4
-BRDA:99,174,1,6
-BRDA:105,258,0,3
-BRDA:105,258,1,10
-FN:113,WeatherBalloon.Messaging.BalloonState WeatherBalloon.BalloonModule.BalloonModule::DetermineNewState(WeatherBalloon.Messaging.BalloonState,WeatherBalloon.Messaging.GPSLocation)
-FNDA:10,WeatherBalloon.Messaging.BalloonState WeatherBalloon.BalloonModule.BalloonModule::DetermineNewState(WeatherBalloon.Messaging.BalloonState,WeatherBalloon.Messaging.GPSLocation)
-DA:114,10
-DA:115,10
-DA:117,10
+FN:101,System.Void WeatherBalloon.BalloonModule.BalloonModule::Receive(WeatherBalloon.Messaging.GPSMessage)
+FNDA:13,System.Void WeatherBalloon.BalloonModule.BalloonModule::Receive(WeatherBalloon.Messaging.GPSMessage)
+DA:102,13
+DA:103,13
+DA:104,13
+DA:105,13
+DA:107,13
+DA:109,13
+DA:110,4
+DA:112,4
+DA:113,2
+DA:114,2
+DA:116,2
+DA:117,2
+DA:119,4
 DA:120,4
-DA:121,1
-DA:122,1
-DA:123,1
-DA:124,4
-DA:126,5
-DA:127,2
-DA:128,2
-DA:129,2
-DA:130,5
-DA:132,1
-DA:133,0
-DA:134,0
-DA:135,0
-DA:136,1
-DA:140,10
-DA:141,10
-BRDA:117,6,1,4
-BRDA:120,43,0,2
-BRDA:120,43,1,2
-BRDA:120,70,0,1
-BRDA:117,6,2,5
-BRDA:126,93,0,4
-BRDA:126,93,1,1
-BRDA:126,120,0,2
-BRDA:117,6,3,1
-BRDA:132,152,0,0
-BRDA:117,6,0,10
-BRDA:120,70,1,10
-BRDA:126,120,1,10
-BRDA:132,152,1,10
-FN:160,WeatherBalloon.Messaging.BalloonMessage WeatherBalloon.BalloonModule.BalloonModule::CreateBalloonMessage()
-FNDA:9,WeatherBalloon.Messaging.BalloonMessage WeatherBalloon.BalloonModule.BalloonModule::CreateBalloonMessage()
-DA:161,9
-DA:162,9
-DA:163,9
-DA:164,9
-DA:165,9
-DA:166,9
-DA:167,9
-DA:168,9
-DA:169,9
-DA:170,9
-FN:25,System.Void WeatherBalloon.BalloonModule.BalloonModule::.ctor()
-FNDA:10,System.Void WeatherBalloon.BalloonModule.BalloonModule::.ctor()
-DA:26,10
-DA:30,10
-DA:35,10
-DA:51,10
-DA:58,10
-DA:59,10
-DA:61,10
-DA:67,10
-DA:68,10
-DA:70,10
-FN:143,System.Void WeatherBalloon.BalloonModule.BalloonModule/<Transmit>d__17::MoveNext()
-FNDA:9,System.Void WeatherBalloon.BalloonModule.BalloonModule/<Transmit>d__17::MoveNext()
-DA:144,9
-DA:145,9
-DA:147,9
-DA:149,9
-DA:151,9
-DA:152,9
-BRDA:149,89,1,9
-LF:73
-LH:70
-BRF:25
-BRH:24
+DA:121,4
+DA:124,13
+DA:125,4
+DA:126,4
+DA:127,4
+DA:129,4
+DA:130,9
+DA:131,4
+DA:132,4
+DA:133,4
+DA:134,4
+DA:135,13
+DA:136,13
+BRDA:109,65,0,4
+BRDA:112,75,0,2
+BRDA:112,75,1,2
+BRDA:112,88,0,2
+BRDA:112,88,1,4
+BRDA:109,65,1,13
+BRDA:124,174,0,4
+BRDA:124,174,1,9
+BRDA:130,258,0,4
+BRDA:130,258,1,13
+FN:144,WeatherBalloon.Messaging.BalloonState WeatherBalloon.BalloonModule.BalloonModule::DetermineNewState(WeatherBalloon.Messaging.BalloonState,WeatherBalloon.Messaging.GPSLocation)
+FNDA:13,WeatherBalloon.Messaging.BalloonState WeatherBalloon.BalloonModule.BalloonModule::DetermineNewState(WeatherBalloon.Messaging.BalloonState,WeatherBalloon.Messaging.GPSLocation)
+DA:145,13
+DA:146,13
+DA:148,13
+DA:151,5
+DA:152,1
+DA:153,1
+DA:154,1
+DA:155,5
+DA:157,5
+DA:158,2
+DA:159,2
+DA:160,2
+DA:161,5
+DA:163,3
+DA:164,1
+DA:165,1
+DA:166,1
+DA:167,3
+DA:171,13
+DA:172,13
+BRDA:148,6,1,5
+BRDA:151,43,0,2
+BRDA:151,43,1,3
+BRDA:151,70,0,1
+BRDA:148,6,2,5
+BRDA:157,93,0,4
+BRDA:157,93,1,1
+BRDA:157,120,0,2
+BRDA:148,6,3,3
+BRDA:163,152,0,1
+BRDA:148,6,0,13
+BRDA:151,70,1,13
+BRDA:157,120,1,13
+BRDA:163,152,1,13
+FN:207,WeatherBalloon.Messaging.BalloonMessage WeatherBalloon.BalloonModule.BalloonModule::CreateBalloonMessage()
+FNDA:12,WeatherBalloon.Messaging.BalloonMessage WeatherBalloon.BalloonModule.BalloonModule::CreateBalloonMessage()
+DA:208,12
+DA:209,12
+DA:210,12
+DA:211,12
+DA:212,12
+DA:213,12
+DA:214,12
+DA:215,12
+DA:216,12
+DA:217,12
+FN:48,System.Void WeatherBalloon.BalloonModule.BalloonModule::.ctor()
+FNDA:13,System.Void WeatherBalloon.BalloonModule.BalloonModule::.ctor()
+DA:49,13
+DA:54,13
+DA:59,13
+DA:69,13
+DA:79,13
+DA:84,13
+DA:86,13
+DA:92,13
+DA:93,13
+DA:95,13
+FN:179,System.Void WeatherBalloon.BalloonModule.BalloonModule/<TransmitBalloonMessage>d__17::MoveNext()
+FNDA:12,System.Void WeatherBalloon.BalloonModule.BalloonModule/<TransmitBalloonMessage>d__17::MoveNext()
+DA:180,12
+DA:181,12
+DA:183,12
+DA:186,12
+DA:187,12
+DA:189,11
+DA:190,11
+DA:191,1
+DA:192,1
+DA:194,1
+DA:195,1
+DA:198,11
+DA:199,12
+BRDA:183,56,0,12
+BRDA:187,98,1,11
+LF:80
+LH:80
+BRF:26
+BRH:26
 FNF:5
 FNH:5
 end_of_record
@@ -195,14 +203,14 @@ FNF:7
 FNH:0
 end_of_record
 SF:D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\FakeModuleClient.cs
-FN:10,System.Void WeatherBalloon.Common.FakeModuleClient::.ctor()
-FNDA:9,System.Void WeatherBalloon.Common.FakeModuleClient::.ctor()
-DA:11,9
-FN:13,System.Void WeatherBalloon.Common.FakeModuleClient/<SendEventAsync>d__1::MoveNext()
-FNDA:9,System.Void WeatherBalloon.Common.FakeModuleClient/<SendEventAsync>d__1::MoveNext()
-DA:14,9
-DA:15,9
-DA:16,9
+FN:17,System.Void WeatherBalloon.Common.FakeModuleClient::.ctor()
+FNDA:11,System.Void WeatherBalloon.Common.FakeModuleClient::.ctor()
+DA:18,11
+FN:20,System.Void WeatherBalloon.Common.FakeModuleClient/<SendEventAsync>d__1::MoveNext()
+FNDA:11,System.Void WeatherBalloon.Common.FakeModuleClient/<SendEventAsync>d__1::MoveNext()
+DA:21,11
+DA:22,11
+DA:23,11
 LF:4
 LH:4
 BRF:0
@@ -212,48 +220,53 @@ FNH:2
 end_of_record
 SF:D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\Logging.cs
 FN:22,System.Void WeatherBalloon.Common.Logger::Log(WeatherBalloon.Common.LoggingLevel,System.String)
-FNDA:14,System.Void WeatherBalloon.Common.Logger::Log(WeatherBalloon.Common.LoggingLevel,System.String)
-DA:23,14
-DA:24,14
-DA:25,14
-DA:26,14
-DA:27,14
-DA:28,14
-BRDA:24,14,0,14
-BRDA:24,14,1,14
+FNDA:18,System.Void WeatherBalloon.Common.Logger::Log(WeatherBalloon.Common.LoggingLevel,System.String)
+DA:23,18
+DA:24,18
+DA:25,18
+DA:26,18
+DA:27,18
+DA:28,18
+BRDA:24,14,0,18
+BRDA:24,14,1,18
 FN:30,System.Void WeatherBalloon.Common.Logger::LogInfo(System.String)
-FNDA:14,System.Void WeatherBalloon.Common.Logger::LogInfo(System.String)
-DA:31,14
-DA:32,14
-DA:33,14
+FNDA:17,System.Void WeatherBalloon.Common.Logger::LogInfo(System.String)
+DA:31,17
+DA:32,17
+DA:33,17
 FN:35,System.Void WeatherBalloon.Common.Logger::LogWarning(System.String)
 FNDA:0,System.Void WeatherBalloon.Common.Logger::LogWarning(System.String)
 DA:36,0
 DA:37,0
 DA:38,0
-FN:40,System.Void WeatherBalloon.Common.Logger::LogFatalError(System.String)
+FN:40,System.Void WeatherBalloon.Common.Logger::LogError(System.String)
+FNDA:1,System.Void WeatherBalloon.Common.Logger::LogError(System.String)
+DA:41,1
+DA:42,1
+DA:43,1
+FN:44,System.Void WeatherBalloon.Common.Logger::LogFatalError(System.String)
 FNDA:0,System.Void WeatherBalloon.Common.Logger::LogFatalError(System.String)
-DA:41,0
-DA:42,0
-DA:43,0
+DA:45,0
+DA:46,0
+DA:47,0
 FN:14,System.Void WeatherBalloon.Common.Logger::.cctor()
 FNDA:1,System.Void WeatherBalloon.Common.Logger::.cctor()
 DA:15,1
-LF:16
-LH:10
+LF:19
+LH:13
 BRF:2
 BRH:2
-FNF:5
-FNH:3
+FNF:6
+FNH:4
 end_of_record
 SF:D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Common\MessageHelper.cs
 FN:11,T WeatherBalloon.Common.MessageHelper::ParseMessage(Microsoft.Azure.Devices.Client.Message)
-FNDA:9,T WeatherBalloon.Common.MessageHelper::ParseMessage(Microsoft.Azure.Devices.Client.Message)
-DA:12,9
-DA:13,9
-DA:14,9
-DA:16,9
-DA:17,9
+FNDA:11,T WeatherBalloon.Common.MessageHelper::ParseMessage(Microsoft.Azure.Devices.Client.Message)
+DA:12,11
+DA:13,11
+DA:14,11
+DA:16,11
+DA:17,11
 LF:5
 LH:5
 BRF:0
@@ -291,23 +304,23 @@ FNH:0
 end_of_record
 SF:D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\BalloonMessage.cs
 FN:8,System.String WeatherBalloon.Messaging.BalloonMessage::get_Type()
-FNDA:54,System.String WeatherBalloon.Messaging.BalloonMessage::get_Type()
-DA:9,54
+FNDA:69,System.String WeatherBalloon.Messaging.BalloonMessage::get_Type()
+DA:9,69
 FN:10,WeatherBalloon.Messaging.GPSLocation WeatherBalloon.Messaging.BalloonMessage::get_Location()
-FNDA:87,WeatherBalloon.Messaging.GPSLocation WeatherBalloon.Messaging.BalloonMessage::get_Location()
-DA:11,87
+FNDA:99,WeatherBalloon.Messaging.GPSLocation WeatherBalloon.Messaging.BalloonMessage::get_Location()
+DA:11,99
 FN:11,System.Double WeatherBalloon.Messaging.BalloonMessage::get_AveAscent()
-FNDA:40,System.Double WeatherBalloon.Messaging.BalloonMessage::get_AveAscent()
-DA:12,40
+FNDA:50,System.Double WeatherBalloon.Messaging.BalloonMessage::get_AveAscent()
+DA:12,50
 FN:12,System.Double WeatherBalloon.Messaging.BalloonMessage::get_AveDescent()
-FNDA:40,System.Double WeatherBalloon.Messaging.BalloonMessage::get_AveDescent()
-DA:13,40
+FNDA:50,System.Double WeatherBalloon.Messaging.BalloonMessage::get_AveDescent()
+DA:13,50
 FN:13,System.Double WeatherBalloon.Messaging.BalloonMessage::get_BurstAltitude()
-FNDA:39,System.Double WeatherBalloon.Messaging.BalloonMessage::get_BurstAltitude()
-DA:14,39
+FNDA:49,System.Double WeatherBalloon.Messaging.BalloonMessage::get_BurstAltitude()
+DA:14,49
 FN:14,WeatherBalloon.Messaging.BalloonState WeatherBalloon.Messaging.BalloonMessage::get_State()
-FNDA:42,WeatherBalloon.Messaging.BalloonState WeatherBalloon.Messaging.BalloonMessage::get_State()
-DA:15,42
+FNDA:54,WeatherBalloon.Messaging.BalloonState WeatherBalloon.Messaging.BalloonMessage::get_State()
+DA:15,54
 LF:6
 LH:6
 BRF:0
@@ -317,32 +330,32 @@ FNH:6
 end_of_record
 SF:D:\Source\GitHub\WeatherBalloonEdge\master\WeatherBalloonEdge\shared\WeatherBalloon.Messaging\GPSLocation.cs
 FN:4,System.Double WeatherBalloon.Messaging.GPSLocation::get_track()
-FNDA:51,System.Double WeatherBalloon.Messaging.GPSLocation::get_track()
-DA:5,51
+FNDA:61,System.Double WeatherBalloon.Messaging.GPSLocation::get_track()
+DA:5,61
 FN:5,System.String WeatherBalloon.Messaging.GPSLocation::get_type()
-FNDA:27,System.String WeatherBalloon.Messaging.GPSLocation::get_type()
-DA:6,27
+FNDA:34,System.String WeatherBalloon.Messaging.GPSLocation::get_type()
+DA:6,34
 FN:6,System.Double WeatherBalloon.Messaging.GPSLocation::get_long()
-FNDA:51,System.Double WeatherBalloon.Messaging.GPSLocation::get_long()
-DA:7,51
+FNDA:61,System.Double WeatherBalloon.Messaging.GPSLocation::get_long()
+DA:7,61
 FN:7,System.Int32 WeatherBalloon.Messaging.GPSLocation::get_mode()
-FNDA:51,System.Int32 WeatherBalloon.Messaging.GPSLocation::get_mode()
-DA:8,51
+FNDA:61,System.Int32 WeatherBalloon.Messaging.GPSLocation::get_mode()
+DA:8,61
 FN:8,System.String WeatherBalloon.Messaging.GPSLocation::get_time()
-FNDA:51,System.String WeatherBalloon.Messaging.GPSLocation::get_time()
-DA:9,51
+FNDA:61,System.String WeatherBalloon.Messaging.GPSLocation::get_time()
+DA:9,61
 FN:9,System.Double WeatherBalloon.Messaging.GPSLocation::get_lat()
-FNDA:51,System.Double WeatherBalloon.Messaging.GPSLocation::get_lat()
-DA:10,51
+FNDA:61,System.Double WeatherBalloon.Messaging.GPSLocation::get_lat()
+DA:10,61
 FN:10,System.Double WeatherBalloon.Messaging.GPSLocation::get_alt()
-FNDA:48,System.Double WeatherBalloon.Messaging.GPSLocation::get_alt()
-DA:11,48
+FNDA:60,System.Double WeatherBalloon.Messaging.GPSLocation::get_alt()
+DA:11,60
 FN:11,System.Double WeatherBalloon.Messaging.GPSLocation::get_speed()
-FNDA:51,System.Double WeatherBalloon.Messaging.GPSLocation::get_speed()
-DA:12,51
+FNDA:61,System.Double WeatherBalloon.Messaging.GPSLocation::get_speed()
+DA:12,61
 FN:12,System.Double WeatherBalloon.Messaging.GPSLocation::get_climb()
-FNDA:77,System.Double WeatherBalloon.Messaging.GPSLocation::get_climb()
-DA:13,77
+FNDA:88,System.Double WeatherBalloon.Messaging.GPSLocation::get_climb()
+DA:13,88
 LF:9
 LH:9
 BRF:0
@@ -355,8 +368,8 @@ FN:6,System.String WeatherBalloon.Messaging.GPSMessage::get_Type()
 FNDA:0,System.String WeatherBalloon.Messaging.GPSMessage::get_Type()
 DA:7,0
 FN:8,WeatherBalloon.Messaging.GPSLocation WeatherBalloon.Messaging.GPSMessage::get_Location()
-FNDA:110,WeatherBalloon.Messaging.GPSLocation WeatherBalloon.Messaging.GPSMessage::get_Location()
-DA:9,110
+FNDA:122,WeatherBalloon.Messaging.GPSLocation WeatherBalloon.Messaging.GPSMessage::get_Location()
+DA:9,122
 LF:2
 LH:1
 BRF:0
@@ -369,21 +382,21 @@ FN:8,System.String WeatherBalloon.Messaging.MessageBase::get_Type()
 FNDA:0,System.String WeatherBalloon.Messaging.MessageBase::get_Type()
 DA:9,0
 FN:9,System.DateTime WeatherBalloon.Messaging.MessageBase::get_Timestamp()
-FNDA:55,System.DateTime WeatherBalloon.Messaging.MessageBase::get_Timestamp()
-DA:10,55
+FNDA:70,System.DateTime WeatherBalloon.Messaging.MessageBase::get_Timestamp()
+DA:10,70
 FN:17,System.Byte[] WeatherBalloon.Messaging.MessageBase::ToRawBytes()
-FNDA:9,System.Byte[] WeatherBalloon.Messaging.MessageBase::ToRawBytes()
-DA:18,9
-DA:19,9
-DA:20,9
-DA:22,9
-DA:23,9
+FNDA:12,System.Byte[] WeatherBalloon.Messaging.MessageBase::ToRawBytes()
+DA:18,12
+DA:19,12
+DA:20,12
+DA:22,12
+DA:23,12
 FN:11,System.Void WeatherBalloon.Messaging.MessageBase::.ctor()
-FNDA:28,System.Void WeatherBalloon.Messaging.MessageBase::.ctor()
-DA:12,28
-DA:13,28
-DA:14,28
-DA:15,28
+FNDA:36,System.Void WeatherBalloon.Messaging.MessageBase::.ctor()
+DA:12,36
+DA:13,36
+DA:14,36
+DA:15,36
 LF:11
 LH:10
 BRF:0

@@ -4,6 +4,7 @@ using Shouldly;
 using FakeItEasy;
 using System.Text;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
@@ -54,9 +55,11 @@ namespace BalloonModule.Test
 
             // act
             balloonModule.Receive(gpsMessage);
-            balloonModule.Transmit(fakeModuleClient);
+            var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
+            task.Result.ShouldBe(true);
+
 
             // Sent a Balloon message?
             fakeModuleClient.SentMessages.Count.ShouldBe(1);
@@ -121,9 +124,10 @@ namespace BalloonModule.Test
 
             // act
             balloonModule.Receive(gpsMessage);
-            balloonModule.Transmit(fakeModuleClient);
+            var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
+            task.Result.ShouldBe(true);
 
             // Sent a Balloon message?
             fakeModuleClient.SentMessages.Count.ShouldBe(1);
@@ -191,9 +195,10 @@ namespace BalloonModule.Test
 
             // act
             balloonModule.Receive(gpsMessage);
-            balloonModule.Transmit(fakeModuleClient);
+            var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
+            task.Result.ShouldBe(true);
 
             // Sent a Balloon message?
             fakeModuleClient.SentMessages.Count.ShouldBe(1);
@@ -203,6 +208,65 @@ namespace BalloonModule.Test
             var balloonMessage = MessageHelper.ParseMessage<BalloonMessage>(rawMessage);
 
             balloonMessage.BurstAltitude.ShouldBe(expectedBurstAltitude);
+        }
+
+        [Theory]
+        // Falling, at ground threshold
+        [InlineData(BalloonState.Falling, 
+                    WeatherBalloon.BalloonModule.BalloonModule.GroundAltitudeThreshold,
+                    BalloonState.Landed)]
+        // Falling, above ground threshold
+        [InlineData(BalloonState.Falling, 
+                    WeatherBalloon.BalloonModule.BalloonModule.GroundAltitudeThreshold+1,
+                    BalloonState.Falling)]
+        public void BalloonLandedDetection(BalloonState initialState, double altitude, BalloonState expectedState)
+        {
+            // arrange
+            var fakeModuleClient = new FakeModuleClient();
+
+            var gpsMessage = CreateGPSMessage();
+
+            // set gps to indicate rising balloon state
+            gpsMessage.Location.alt = altitude;
+            
+            var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
+
+            balloonModule.BalloonState = initialState;
+
+            // act
+            balloonModule.Receive(gpsMessage);
+            var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
+
+            // verify
+            task.Result.ShouldBe(true);
+
+            // Sent a Balloon message?
+            fakeModuleClient.SentMessages.Count.ShouldBe(1);
+
+            // Correct message?
+            var rawMessage = fakeModuleClient.SentMessages[0].Item2;
+            var balloonMessage = MessageHelper.ParseMessage<BalloonMessage>(rawMessage);
+
+            balloonMessage.State.ShouldBe(expectedState);
+        }
+
+        [Fact]
+        public void TransmitError()
+        {
+            // arrange
+            var fakeModuleClient = A.Fake<IModuleClient>();
+            A.CallTo(fakeModuleClient).Throws(new Exception("Fake exception generated for testing"));
+
+            var gpsMessage = CreateGPSMessage();
+            
+            var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
+
+            // act 
+            balloonModule.Receive(gpsMessage);
+            var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
+
+            // verify
+            task.Result.ShouldBe(false);
         }
     
 

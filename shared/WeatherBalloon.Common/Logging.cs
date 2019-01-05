@@ -5,7 +5,7 @@ namespace WeatherBalloon.Common
     /// <summary>
     /// Log Levels to allow filtering logging
     /// </summary>
-    public enum LoggingLevel {None = 0, FatalError = 1, Warning = 2, Info = 3, All = 4};
+    public enum LoggingLevel {None = 0, FatalError = 1, Error = 2, Warning = 3, Info = 4, All = 5};
 
     /// <summary>
     /// Simple logging class 
@@ -37,6 +37,10 @@ namespace WeatherBalloon.Common
             Log(LoggingLevel.Warning, message);
         }
 
+        public static void LogError(string message)
+        {
+            Log(LoggingLevel.Error, message);
+        }
         public static void LogFatalError(string message)
         {
             Log(LoggingLevel.FatalError, message);

@@ -97,7 +97,7 @@ namespace WeatherBalloon.BalloonModule
                 return;
             }
 
-            balloonModule.Transmit(wrappedModuleClient);
+            balloonModule.TransmitBalloonMessage(wrappedModuleClient).Wait();
         }
     }
 }

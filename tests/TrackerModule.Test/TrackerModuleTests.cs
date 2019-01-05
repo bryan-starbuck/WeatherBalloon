@@ -2,6 +2,7 @@ using System;
 using Xunit;
 using Shouldly;
 using FakeItEasy;
+using System.Threading.Tasks;
 
 using WeatherBalloon.TrackerModule;
 using WeatherBalloon.Messaging;
@@ -45,9 +46,11 @@ namespace TrackerModule.Test
 
             // act 
             trackerModule.Receive(gpsMessage);
-            trackerModule.Receive(balloonMessage, fakeModuleClient);
+            var task = trackerModule.Receive(balloonMessage, fakeModuleClient);
 
             // verify
+            task.Result.ShouldBe(true);
+
             fakeModuleClient.SentMessages.Count.ShouldBe(1);
 
             // Sent on correct output?
@@ -81,6 +84,26 @@ namespace TrackerModule.Test
 
         }
 
+        [Fact]
+        public void TransmitError()
+        {
+            // arrange
+            var fakeModuleClient = A.Fake<IModuleClient>();
+            A.CallTo(fakeModuleClient).Throws(new Exception("Fake exception generated for testing"));
+
+            var gpsMessage = CreateGPSMessage();
+            var balloonMessage = CreateBalloonMessage();
+
+            var trackerModule = new WeatherBalloon.TrackerModule.TrackerModule();
+
+            // act 
+            trackerModule.Receive(gpsMessage);
+            var task = trackerModule.Receive(balloonMessage, fakeModuleClient);
+
+            // verify
+            task.Result.ShouldBe(false);
+        }
+
 
 
         private GPSMessage CreateGPSMessage()
@@ -100,6 +123,7 @@ namespace TrackerModule.Test
                 }
             };
         }
+
 
         private BalloonMessage CreateBalloonMessage()
         {
