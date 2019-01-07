@@ -46,7 +46,7 @@ namespace WeatherBalloon.TrackerModule
         static async Task Init()
         {
             // Use Mqtt as it is more reliable than ampq 
-            MqttTransportSettings mqttSetting = new MqttTransportSettings(TransportType.Mqtt);
+            MqttTransportSettings mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
             ITransportSettings[] settings = { mqttSetting };
 
             // AmqpTransportSettings amqpSetting = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
