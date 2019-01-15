@@ -195,21 +195,29 @@ if __name__ == '__main__':
   index = 0
    
   try:
+    climb = 1
+
     while True:
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
 
-      
+      alt = dataPoints[index][3]; 
 
-      payload = {'lat':dataPoints[index][1],
+      # simulate the burst of the balloon at 30000 meters
+      if (alt == 30000):
+        climb = -1
+
+      location = {'lat':dataPoints[index][1],
                  'long':dataPoints[index][2],
                 'time': str(datetime.utcnow()),
                  'alt':dataPoints[index][3],
                  'speed':0,
-                 'climb':1,
+                 'climb':climb,
                  'track':105.23,
                  'mode' :3
                  }
+
+      payload = { 'Type' : 'gps','Location' : location}
 
       print(json.dumps(payload))
       r = requests.post("http://localhost:8080/data", json=payload)
@@ -239,7 +247,7 @@ if __name__ == '__main__':
 
       time.sleep(60) #set to whatever
   except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
-    print "\nKilling Thread..."
-  print "Done.\nExiting."
+    print("\nKilling Thread...")
+  print("Done.\nExiting.")
 
 
