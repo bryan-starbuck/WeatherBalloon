@@ -5748,23 +5748,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Bryan\\.nuget\\packages\\": {},
+    "C:\\Users\\admin\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\tests\\LoraModule.Test\\LoraModule.Test.csproj",
+      "projectUniqueName": "d:\\CSharp\\WeatherBalloon\\WeatherBalloon\\tests\\LoraModule.Test\\LoraModule.Test.csproj",
       "projectName": "LoraModule.Test",
-      "projectPath": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\tests\\LoraModule.Test\\LoraModule.Test.csproj",
-      "packagesPath": "C:\\Users\\Bryan\\.nuget\\packages\\",
-      "outputPath": "D:\\Source\\GitHub\\WeatherBalloonEdge\\master\\WeatherBalloonEdge\\tests\\LoraModule.Test\\obj\\",
+      "projectPath": "d:\\CSharp\\WeatherBalloon\\WeatherBalloon\\tests\\LoraModule.Test\\LoraModule.Test.csproj",
+      "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+      "outputPath": "d:\\CSharp\\WeatherBalloon\\WeatherBalloon\\tests\\LoraModule.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Bryan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

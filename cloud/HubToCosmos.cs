@@ -17,26 +17,10 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
 
+using WeatherBalloon.Messaging;
+
 namespace WeatherBalloon.Cloud
 {
-
-    public class IoTDocument
-    {
-        public string etlTime { get; set; }
-        public double lat { get; set; }
-        public double lon { get; set; }
-        public double initial_alt { get; set; }
-        public double hour { get; set; }
-        public double min { get; set; }
-        public double second { get; set; }
-        public double day { get; set; }
-        public double month { get; set; }
-        public double year { get; set; }
-        public double ascent { get; set; }
-        public double drag { get; set; }
-        public string burst { get; set; }
-    }
-
     public static class HubToCosmos
     {
 
@@ -44,22 +28,30 @@ namespace WeatherBalloon.Cloud
         private static string cosmosKey = Environment.GetEnvironmentVariable("CosmosKey");
         private static string cosmosDB = Environment.GetEnvironmentVariable("CosmosDB");
         private static string cosmosDoc = Environment.GetEnvironmentVariable("CosmosDoc");
-        private static string burst = Environment.GetEnvironmentVariable("Burst");
 
         [FunctionName("HubToCosmos")]
-        public static void Run([IoTHubTrigger("messages/events", Connection = "IoTHub")]EventData message, ILogger log)
+        public static void Run([IoTHubTrigger("messages/events", Connection = "IoTConn")]EventData message, ILogger log)
         {
-            var receivedIoT = JsonConvert.DeserializeObject<IoTDocument>(Encoding.UTF8.GetString(message.Body.Array));
-            receivedIoT.etlTime = DateTime.Now.ToString();
-            receivedIoT.burst = burst;
+            log.LogInformation("C# HTTP trigger function processed a request.");
+            var receivedIoT = JsonConvert.DeserializeObject<TrackerMessage>(Encoding.UTF8.GetString(message.Body.Array));
             createDocument(receivedIoT);
+
         }
-        private static async Task createDocument(IoTDocument content)
+        private static async Task createDocument(TrackerMessage content)
         {
-            using (var client = new DocumentClient(new Uri(cosmosUrl), cosmosKey))
+            try
             {
-                await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(cosmosDB, cosmosDoc), content);
+                using (var client = new DocumentClient(new Uri(cosmosUrl), cosmosKey))
+                {
+                    await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(cosmosDB, cosmosDoc), 
+                        content, new RequestOptions { PartitionKey = new PartitionKey(content.partitionid)});
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
         }
     }
 }

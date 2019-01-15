@@ -9,9 +9,11 @@ namespace WeatherBalloon.Messaging
         public virtual string Type { get { return "unknown"; }}
         public DateTime Timestamp { get;set;}
 
+        public string partitionid { get {return Timestamp.ToString("yyyy-MM-dd HH");}}
+
         public MessageBase()
         {
-            Timestamp = DateTime.UtcNow;
+            Timestamp = DateTime.UtcNow;            
         }
 
         public Byte[] ToRawBytes()
