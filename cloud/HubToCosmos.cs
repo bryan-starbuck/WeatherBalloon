@@ -34,8 +34,7 @@ namespace WeatherBalloon.Cloud
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             var receivedIoT = JsonConvert.DeserializeObject<TrackerMessage>(Encoding.UTF8.GetString(message.Body.Array));
-            createDocument(receivedIoT);
-
+            createDocument(receivedIoT).Wait();
         }
         private static async Task createDocument(TrackerMessage content)
         {

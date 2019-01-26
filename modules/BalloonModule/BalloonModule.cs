@@ -41,7 +41,7 @@ namespace WeatherBalloon.BalloonModule
         /// <summary>
         /// Expected burst altitude
         /// </summary>
-        public const double PredictedBurstAltitude = 90000.0; // todo validate number
+        public const double PredictedBurstAltitude = 30000.0; // todo validate number
 
         /// <summary>
         /// Rate the balloon is rising since Launch detected

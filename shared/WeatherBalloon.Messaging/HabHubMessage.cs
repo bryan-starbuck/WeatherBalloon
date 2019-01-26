@@ -15,7 +15,7 @@ namespace WeatherBalloon.Messaging
         public double burst { get; set; }
 
         // HabHub Messages must be for the future, Time will be built 5 min in the future
-        private static DateTime targetTime = DateTime.Now.AddMinutes(5);        
+        private static DateTime targetTime = DateTime.UtcNow.AddMinutes(5);        
         public string hour = targetTime.ToString("HH");
         public string min = targetTime.ToString("mm");
         public string second = targetTime.ToString("ss");
@@ -23,12 +23,14 @@ namespace WeatherBalloon.Messaging
         public string month = targetTime.ToString("MM");
         public string day = targetTime.ToString("dd");
 
-        public Dictionary<string,string> mappedDictionary { get; set;}
-        
-
         public HabHubMessage()
         {
-            mappedDictionary = new Dictionary<string, string>
+            
+        }
+
+        public Dictionary<string,string> ToParameterDictionary()
+        {
+            return new Dictionary<string, string>
             {
                 { "lat",  lat.ToString()},
                 { "lon",  lon.ToString()},
@@ -40,6 +42,7 @@ namespace WeatherBalloon.Messaging
                 { "month", month.ToString()},
                 { "year", year.ToString()},
                 { "ascent", ascent.ToString()},
+                { "drag", "5"},
                 { "burst", burst.ToString()},
                 { "submit", "Run Prediction"}
             };

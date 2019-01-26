@@ -25,6 +25,7 @@ namespace WeatherBalloon.Cloud
         private static string cosmosKey = Environment.GetEnvironmentVariable("CosmosKey");
         private static string cosmosDB = Environment.GetEnvironmentVariable("CosmosDB");
         private static string cosmosDoc = Environment.GetEnvironmentVariable("CosmosDoc");
+        
         public class HabHubPredictionResponse
         {
             public string valid { get; set; }
@@ -42,27 +43,45 @@ namespace WeatherBalloon.Cloud
         private static HttpClient client = new HttpClient();
 
         [FunctionName("TrackerToPrediction")]
-        public static async void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
             //Configurable variables for Cosmos Query
             var minPartitionId = DateTime.Now.ToString("yyyy-MM-dd HH");
-            var whereVariable = ".partitionid";
-            var orderByVariable = ".TimeStamp";
+            //var whereVariable = ".partitionid";
+            var orderByVariable = "._ts";
 
             var queryBuilder = new StringBuilder();
             queryBuilder.Append("SELECT Top 1* FROM ");
-            queryBuilder.Append(cosmosDoc).Append(" WHERE ").Append(cosmosDoc).Append(whereVariable).Append(" >= ").Append(@"'").Append(minPartitionId).Append(@"'");
+            queryBuilder.Append(cosmosDoc);
+            //queryBuilder.Append(cosmosDoc).Append(" WHERE ").Append(cosmosDoc).Append(whereVariable).Append(" >= ").Append(@"'").Append(minPartitionId).Append(@"'");
             queryBuilder.Append(" ORDER BY ").Append(cosmosDoc).Append(orderByVariable).Append(" DESC");
+
+            log.LogInformation($"Query text: {queryBuilder.ToString()}");
 
             var client = new DocumentClient(new Uri(cosmosUrl), cosmosKey);
 
+            FeedOptions feedOptions = new FeedOptions() { EnableCrossPartitionQuery = true };
             //Get Tracker message from Cosmos
-            IQueryable<TrackerMessage> getTrackerMessage =
-                client.CreateDocumentQuery<TrackerMessage>(UriFactory.CreateDocumentCollectionUri(cosmosDB, cosmosDoc), queryBuilder.ToString());
-            var trackerMessage = JsonConvert.DeserializeObject<TrackerMessage>(getTrackerMessage.ToString());
+            var trackerMessage =
+                client.CreateDocumentQuery<TrackerMessage>(UriFactory.CreateDocumentCollectionUri(cosmosDB, cosmosDoc), 
+                    queryBuilder.ToString(), feedOptions).AsEnumerable().FirstOrDefault();
 
+            log.LogInformation($"Balloon state: {trackerMessage.State}");
+
+            if (trackerMessage.State == BalloonState.PreLaunch || trackerMessage.State == BalloonState.Landed)
+            {
+                log.LogInformation($"Balloon not in the air, no prediction calculated");
+                return;
+            }
+
+            if (trackerMessage.BalloonLocation.climb < 1)
+            {
+                // climb rate of less than 1 is a invalid in habhub
+                trackerMessage.BalloonLocation.climb = 5;
+            }
+            
             //Map TrackerMessage to HabHubMessage
             HabHubMessage habHubMessage = new HabHubMessage();
             habHubMessage.alt = trackerMessage.BalloonLocation.alt;
@@ -70,13 +89,10 @@ namespace WeatherBalloon.Cloud
             habHubMessage.lat = trackerMessage.BalloonLocation.lat;
             habHubMessage.lon = trackerMessage.BalloonLocation.@long;
 
-            //Habhub only has ascent so I must determine sign
             habHubMessage.ascent = trackerMessage.AveAscent;
-            if (trackerMessage.AveAscent < trackerMessage.AveDescent)
-                habHubMessage.ascent = trackerMessage.AveDescent * -1;
 
-            var content = new FormUrlEncodedContent(habHubMessage.mappedDictionary);
-            await postFunction(content);
+            var content = new FormUrlEncodedContent(habHubMessage.ToParameterDictionary());
+            postFunction(content).Wait();
         }
 
         private static async Task postFunction(FormUrlEncodedContent content)
@@ -96,14 +112,40 @@ namespace WeatherBalloon.Cloud
                     if (records.Count >= 2)
                     {
                         var predictionMessage = generatePredictionMessage(records);
-                        //sendPrediction(predictionMessage);
+
+                        if (predictionMessage !=null)
+                        {
+                            WriteDocument(predictionMessage).Wait();
+                        }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Write document to cosmos - TODO, refactor Cosmos operations into class shared with other azure functions
+        /// </summary>
+        /// <param name="prediction"></param>
+        /// <returns></returns>
+        private static async Task WriteDocument(PredictionMessage prediction)
+        {
+            try
+            {
+                using (var client = new DocumentClient(new Uri(cosmosUrl), cosmosKey))
+                {
+                    await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(cosmosDB, cosmosDoc), 
+                        prediction, new RequestOptions { PartitionKey = new PartitionKey(prediction.partitionid)});
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
 
-        /*         private static async void sendPrediction(PredictionMessage prediction)
+        }
+
+
+        /*  private static async void sendPrediction(PredictionMessage prediction)
                 {
                     var contentType = "Prediction";
 
@@ -148,7 +190,7 @@ namespace WeatherBalloon.Cloud
 
         }
 
-        private static List<PredictionMessage> getRecords(string csv)
+        private static List<HabHubPredictionPoint> getRecords(string csv)
         {
             var csvOfRecords = new CsvHelper.CsvReader(new StringReader(csv));
 
@@ -156,19 +198,19 @@ namespace WeatherBalloon.Cloud
             csvOfRecords.Configuration.HasHeaderRecord = false;
             csvOfRecords.Configuration.MissingFieldFound = null;
             csvOfRecords.Read();
-            var records = new List<PredictionMessage>(csvOfRecords.GetRecords<PredictionMessage>());
+            var records = new List<HabHubPredictionPoint>(csvOfRecords.GetRecords<HabHubPredictionPoint>());
 
             return records;
         }
 
-        private static PredictionMessage generatePredictionMessage(List<PredictionMessage> records)
+        private static PredictionMessage generatePredictionMessage(List<HabHubPredictionPoint> records)
         {
             var landingRecord = records[records.Count - 2];
             var predictionMessage = new PredictionMessage();
             predictionMessage.PredictionDate = DateTime.UtcNow;
-            predictionMessage.LandingDateTime = UnixTimeToDateTime(landingRecord.UnixTimestamp);
-            predictionMessage.LandingLat = landingRecord.LandingLat;
-            predictionMessage.LandingLong = landingRecord.LandingLong;
+            predictionMessage.LandingDateTime = UnixTimeToDateTime(landingRecord.Timestamp);
+            predictionMessage.LandingLat = landingRecord.Latitude;
+            predictionMessage.LandingLong = landingRecord.Longitude;
 
             return predictionMessage;
         }
