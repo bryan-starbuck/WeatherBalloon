@@ -16,6 +16,8 @@ using System.Web;
 using System.Collections.Generic;
 using System.IO;
 
+using WeatherBalloon.Cloud.HabHub;
+
 namespace WeatherBalloon.Cloud
 {
 

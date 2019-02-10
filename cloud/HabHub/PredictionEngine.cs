@@ -12,7 +12,7 @@ using System.Text;
 using WeatherBalloon.Messaging;
 using System.IO;
 
-namespace WeatherBalloon.Cloud
+namespace WeatherBalloon.Cloud.HabHub
 {
     public class PredictionEngine
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace WeatherBalloon.Cloud
+namespace WeatherBalloon.Cloud.HabHub
 {
     public class HabHubPredictionPoint
     {

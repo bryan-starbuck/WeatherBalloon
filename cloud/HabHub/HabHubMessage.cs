@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Collections.Generic;
 
-namespace WeatherBalloon.Cloud
+namespace WeatherBalloon.Cloud.HabHub
 {
     public class HabHubMessage
     {
