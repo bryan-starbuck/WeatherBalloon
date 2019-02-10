@@ -57,6 +57,11 @@ namespace WeatherBalloon.Cloud.HabHub
                 // get uuid
                 var uuid = predictionResponse.uuid;
 
+                if (String.IsNullOrEmpty(uuid))
+                {
+                    throw new Exception($"Error getting uuid from habhub.  No prediction available. HabHubResponse: {responseString}");
+                }
+
                 // now check the status of generating the prediction
                 var progressUrl = BuildProgressUrl(uuid);
                 

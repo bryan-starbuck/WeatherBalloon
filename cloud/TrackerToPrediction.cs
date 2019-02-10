@@ -27,11 +27,13 @@ namespace WeatherBalloon.Cloud
         private static string cosmosKey = Environment.GetEnvironmentVariable("CosmosKey");
         private static string cosmosDB = Environment.GetEnvironmentVariable("CosmosDB");
         private static string cosmosDoc = Environment.GetEnvironmentVariable("CosmosDoc");
+
+        private static string SMSNotificationFunctionKey = Environment.GetEnvironmentVariable("SMSNotificationFunctionKey");
         
-        
+        static HttpClient client = new HttpClient();
 
 
-        // for time conversion
+       
         
 
         [FunctionName("TrackerToPrediction")]
@@ -88,12 +90,36 @@ namespace WeatherBalloon.Cloud
                 {
                     prediction.BalloonLocation = trackerMessage.BalloonLocation;
                     WriteDocument(prediction).Wait();
+
+                    try
+                    {
+                        SendPredictionNotification(prediction);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, "Failed to send prediction to notification function.");
+                    }
+
                 }
             }
             catch (Exception ex)
             {
                 log.LogError(ex, $"Failed to generate prediction: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Send the new prediction to the SMS Notification function
+        /// </summary>
+        /// <param name="prediction"></param>
+        /// <returns></returns>
+        private static void SendPredictionNotification(PredictionMessage prediction)
+        {
+            // todo - put this in the app properties
+            var url = $"https://habservices.azurewebsites.net/api/PredictionToTwilio?code={SMSNotificationFunctionKey}";
+            var body = JsonConvert.SerializeObject(prediction);
+            
+            client.PostAsJsonAsync(url, body);
         }
 
         /// <summary>
