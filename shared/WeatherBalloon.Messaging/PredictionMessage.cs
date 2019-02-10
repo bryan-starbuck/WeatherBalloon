@@ -11,6 +11,7 @@ namespace WeatherBalloon.Messaging
         
         public float LandingLat {get;set;}
         public float LandingLong {get;set;}
+        public float LandingAltitude {get;set;}
         public DateTime LandingDateTime {get;set;}
         public Int64 UnixTimestamp {get;set;}
 

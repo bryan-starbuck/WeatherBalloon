@@ -3,11 +3,10 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Collections.Generic;
 
-namespace WeatherBalloon.Messaging
+namespace WeatherBalloon.Cloud
 {
     public class HabHubMessage
     {
-
         public double lat { get; set; }
         public double lon { get; set; }
         public double alt { get; set; }
