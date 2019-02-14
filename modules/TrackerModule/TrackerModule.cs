@@ -2,6 +2,7 @@ using System;
 using Microsoft.Azure.Devices.Client;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 using WeatherBalloon.Messaging;
 using WeatherBalloon.Common;
@@ -13,6 +14,8 @@ namespace WeatherBalloon.TrackerModule
     /// </summary>
     public class TrackerModule 
     {
+        public string DeviceName { get;set; }
+
         /// <summary>
         /// IoT Edge Input name for telemetry  
         /// </summary>
@@ -38,7 +41,7 @@ namespace WeatherBalloon.TrackerModule
         
         public TrackerModule ()
         {
-
+            DeviceName = "Unknown Tracker";
         }
 
         /// <summary>
@@ -51,6 +54,8 @@ namespace WeatherBalloon.TrackerModule
             lock (lockingUpdateObject)
             {
                 Location = message.Location;
+
+                Logger.LogInfo($"Recieved GPS Location.");
             }
 
             return true;
@@ -63,6 +68,8 @@ namespace WeatherBalloon.TrackerModule
         /// <returns></returns>
         public async Task<bool> Receive (BalloonMessage message, IModuleClient moduleClient)
         {
+            Logger.LogInfo($"Recieved Balloon Message.");
+
             // Map data to a new Tracker message
             var trackerMessage = new TrackerMessage()
             {
@@ -71,7 +78,9 @@ namespace WeatherBalloon.TrackerModule
                 State = message.State, 
                 AveAscent = message.AveAscent, 
                 AveDescent = message.AveDescent,
-                BurstAltitude = message.BurstAltitude
+                BurstAltitude = message.BurstAltitude,
+                DeviceName = this.DeviceName,
+                FlightId = message.FlightId
             };
 
             try 
@@ -79,6 +88,8 @@ namespace WeatherBalloon.TrackerModule
                 Message iotMessage = new Message(trackerMessage.ToRawBytes());
 
                 await moduleClient.SendEventAsync(TrackerOutputName, iotMessage);
+
+                Logger.LogInfo($"transmitted message: {JsonConvert.SerializeObject(trackerMessage)}.");
             }
             catch (Exception ex)
             {

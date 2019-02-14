@@ -15,10 +15,11 @@ using WeatherBalloon.Messaging;
 using Twilio;
 using WeatherBalloon.Cloud.Twilio;
 using System.Text.RegularExpressions;
+using WeatherBalloon.Cloud.Documents;
 
 namespace WeatherBalloon.Cloud
 {
-    public static class HttpSMSNotification
+    public static class HttpToSMSNotification
     {
         private static string accountSid = Environment.GetEnvironmentVariable("TwilioAccountSID");
         private static string authToken = Environment.GetEnvironmentVariable("TwilioAuthToken");
@@ -27,7 +28,7 @@ namespace WeatherBalloon.Cloud
 
          private static string toPhoneNumber = Environment.GetEnvironmentVariable("ToPhoneNumber");
 
-        [FunctionName("PredictionToTwilio")]
+        [FunctionName("HttpToSMSNotification")]
         [return: TwilioSms(AccountSidSetting = "TwilioAccountSid", AuthTokenSetting = "TwilioAuthToken")]
         public static CreateMessageOptions Run(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] 
@@ -44,7 +45,7 @@ namespace WeatherBalloon.Cloud
                 fixedBody = fixedBody.Substring(1);
                 fixedBody = fixedBody.Substring(0, fixedBody.Length -1);
 
-                var predictionMessage = JsonConvert.DeserializeObject<PredictionMessage>(fixedBody);
+                var predictionMessage = JsonConvert.DeserializeObject<PredictionDocument>(fixedBody);
 
                 var predictionNotification = new PredictionNotification(predictionMessage);
             

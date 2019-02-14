@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
+using Microsoft.Azure.Devices.Shared; // For TwinCollection
+using Newtonsoft.Json;
 
 using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
@@ -49,18 +51,24 @@ namespace WeatherBalloon.TrackerModule
             MqttTransportSettings mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
             ITransportSettings[] settings = { mqttSetting };
 
-            // AmqpTransportSettings amqpSetting = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
-            // ITransportSettings[] settings = { amqpSetting };
-
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
             await ioTHubModuleClient.OpenAsync();
             Console.WriteLine("IoT Hub module client initialized.");
 
+            // get module twin settings
+            var moduleTwin = await ioTHubModuleClient.GetTwinAsync();
+            await OnDesiredPropertiesUpdate(moduleTwin.Properties.Desired, ioTHubModuleClient);
+
+            // Attach a callback for updates to the module twin's desired properties.
+            await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertiesUpdate, null);
+
             // Register callback to be called when a message is received by the module
             await ioTHubModuleClient.SetInputMessageHandlerAsync(TrackerModule.TelemetryInputName, ProcessTelemetry, ioTHubModuleClient);
             // Register callback to be called when a message is received by the module
             await ioTHubModuleClient.SetInputMessageHandlerAsync(TrackerModule.BalloonInputName, ProcessBalloonData, ioTHubModuleClient);
+
+            
         }
 
         /// <summary>
@@ -112,5 +120,31 @@ namespace WeatherBalloon.TrackerModule
             return MessageResponse.Completed;
         }
 
+        static Task OnDesiredPropertiesUpdate(TwinCollection desiredProperties, object userContext)
+        {
+            try
+            {
+                Console.WriteLine("Desired property change:");
+                Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
+
+                if (desiredProperties["DeviceName"]!=null)
+                    trackerModule.DeviceName = desiredProperties["DeviceName"].ToString();
+
+            }
+            catch (AggregateException ex)
+            {
+                foreach (Exception exception in ex.InnerExceptions)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Error when receiving desired property: {0}", exception);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Error when receiving desired property: {0}", ex.Message);
+            }
+            return Task.CompletedTask;
+        }
     }
 }

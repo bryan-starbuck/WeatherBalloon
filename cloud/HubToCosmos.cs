@@ -18,6 +18,7 @@ using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
 
 using WeatherBalloon.Messaging;
+using WeatherBalloon.Cloud.Documents;
 
 namespace WeatherBalloon.Cloud
 {
@@ -33,10 +34,14 @@ namespace WeatherBalloon.Cloud
         public static void Run([IoTHubTrigger("messages/events", Connection = "IoTConn")]EventData message, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
-            var receivedIoT = JsonConvert.DeserializeObject<TrackerMessage>(Encoding.UTF8.GetString(message.Body.Array));
-            createDocument(receivedIoT).Wait();
+
+            var trackerMessage = JsonConvert.DeserializeObject<TrackerMessage>(Encoding.UTF8.GetString(message.Body.Array));
+            
+            var trackerDocument = new TrackerDocument(trackerMessage);
+
+            createDocument(trackerDocument).Wait();   
         }
-        private static async Task createDocument(TrackerMessage content)
+        private static async Task createDocument(TrackerDocument content)
         {
             try
             {

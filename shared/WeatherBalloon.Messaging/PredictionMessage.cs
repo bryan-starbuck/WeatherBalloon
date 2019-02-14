@@ -16,5 +16,9 @@ namespace WeatherBalloon.Messaging
         public Int64 UnixTimestamp {get;set;}
 
         public GPSLocation BalloonLocation {get;set;}
+
+        public string FlightId { get;set; }
+
+        public string TrackerSource { get;set; }
     }
 }

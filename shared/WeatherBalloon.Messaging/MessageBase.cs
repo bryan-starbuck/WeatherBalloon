@@ -7,6 +7,7 @@ namespace WeatherBalloon.Messaging
     public class MessageBase
     {
         public virtual string Type { get { return "unknown"; }}
+        
         public DateTime Timestamp { get;set;}
 
         public string partitionid { get {return Timestamp.ToString("yyyy-MM-dd HH");}}

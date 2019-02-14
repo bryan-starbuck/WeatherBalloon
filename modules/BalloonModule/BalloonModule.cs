@@ -85,13 +85,14 @@ namespace WeatherBalloon.BalloonModule
 
         private object lockingUpdateObject = new object();
 
-        
+        private string FlightId;
+
         /// <summary>
         /// Constructor
         /// </summary>
         public BalloonModule ()
         {
-            
+            FlightId = FlightIdGenerator.Generate();
         }
 
         /// <summary>
@@ -208,6 +209,7 @@ namespace WeatherBalloon.BalloonModule
         {
             return new BalloonMessage()
             {
+                FlightId = this.FlightId,
                 Location = Location, 
                 AveAscent = AverageAscent,
                 AveDescent = AverageDescent,

@@ -6,6 +6,9 @@ namespace WeatherBalloon.Messaging
     {
         public override string Type { get { return "tracker";}}
 
+        public string FlightId {get;set;}
+        public string DeviceName { get;set; }
+
         public GPSLocation BalloonLocation {get;set;}
         public GPSLocation TrackerLocation {get;set;}
 

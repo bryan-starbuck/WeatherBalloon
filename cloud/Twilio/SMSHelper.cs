@@ -13,7 +13,7 @@ namespace WeatherBalloon.Cloud.Twilio
         public static string FormatSMS(PredictionNotification notification)
         {
             //google url docs: https://developers.google.com/maps/documentation/urls/guide
-            return $"Balloon Landing: {notification.PredictionDate} \n https://www.google.com/maps/search/?api=1&query={notification.LandingLat},{notification.LandingLong}&query_place_id=PredictedLanding";
+            return $"Lands @ {notification.LandingDataTime} \nDistance {notification.DistanceToLanding/1000}km\n https://www.google.com/maps/search/?api=1&query={notification.LandingLat},{notification.LandingLong}&query_place_id={notification.FlightId} ";
         }
 
     }

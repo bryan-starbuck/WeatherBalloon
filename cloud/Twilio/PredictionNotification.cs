@@ -1,6 +1,5 @@
 using System;
-
-using WeatherBalloon.Messaging;
+using WeatherBalloon.Cloud.Documents;
 
 namespace WeatherBalloon.Cloud.Twilio
 {
@@ -9,16 +8,25 @@ namespace WeatherBalloon.Cloud.Twilio
     /// </summary>
     public class PredictionNotification
     {
-        public DateTime PredictionDate {get;set;}
+        public DateTime LandingDataTime {get;set;}
         public float LandingLat {get;set;}
         public float LandingLong {get;set;}
 
-        public PredictionNotification(PredictionMessage predictionMessage)
-        {
-            PredictionDate = predictionMessage.PredictionDate;
-            LandingLat = predictionMessage.LandingLat;
-            LandingLong = predictionMessage.LandingLong;
+        public string FlightId {get;set;}
 
+        public string TrackerDevice {get;set;}
+
+        public double DistanceToLanding {get;set;}
+
+
+        public PredictionNotification(PredictionDocument predictionDocument)
+        {
+            LandingDataTime = predictionDocument.LandingDateTime.AddHours(-7); // to arizona time
+            LandingLat = predictionDocument.LandingLat;
+            LandingLong = predictionDocument.LandingLong;
+            FlightId = predictionDocument.FlightId;
+            TrackerDevice = predictionDocument.TrackerSource;
+            DistanceToLanding = predictionDocument.DistanceToLanding;
         }
 
         

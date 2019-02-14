@@ -8,6 +8,8 @@ namespace WeatherBalloon.Messaging
     { 
         public override string Type { get { return "balloon";}}
 
+        public string FlightId {get;set;}
+
         public GPSLocation Location {get;set;}
         public double AveAscent {get;set;}
         public double AveDescent {get;set;}
