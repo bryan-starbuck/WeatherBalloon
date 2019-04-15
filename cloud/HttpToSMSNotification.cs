@@ -45,10 +45,10 @@ namespace WeatherBalloon.Cloud
                 fixedBody = fixedBody.Substring(1);
                 fixedBody = fixedBody.Substring(0, fixedBody.Length -1);
 
-                var predictionMessage = JsonConvert.DeserializeObject<PredictionDocument>(fixedBody);
+                log.LogInformation($"Message Body: {fixedBody}");
 
-                var predictionNotification = new PredictionNotification(predictionMessage);
-            
+                var predictionNotification = JsonConvert.DeserializeObject<PredictionNotification>(fixedBody);
+
                 var message = new CreateMessageOptions(toPhoneNumber)
                 {
                     Body = SMSHelper.FormatSMS(predictionNotification),

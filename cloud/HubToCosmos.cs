@@ -37,11 +37,20 @@ namespace WeatherBalloon.Cloud
 
             var trackerMessage = JsonConvert.DeserializeObject<TrackerMessage>(Encoding.UTF8.GetString(message.Body.Array));
             
-            var trackerDocument = new TrackerDocument(trackerMessage);
+            var trackerDocument =  TrackerDocument.Create(trackerMessage);
+            var balloonDocument = BalloonDocument.Create(trackerMessage);
 
-            createDocument(trackerDocument).Wait();   
+            if (trackerDocument != null)
+            {
+                createDocument<TrackerDocument>(trackerDocument).Wait();
+            }
+
+            if (balloonDocument != null)
+            {
+                createDocument<BalloonDocument>(balloonDocument).Wait();
+            }
         }
-        private static async Task createDocument(TrackerDocument content)
+        private static async Task createDocument<T>(T content) where T: DocumentBase
         {
             try
             {

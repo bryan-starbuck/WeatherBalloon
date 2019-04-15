@@ -9,8 +9,8 @@ namespace WeatherBalloon.Cloud.Twilio
     public class PredictionNotification
     {
         public DateTime LandingDataTime {get;set;}
-        public float LandingLat {get;set;}
-        public float LandingLong {get;set;}
+        public double LandingLat {get;set;}
+        public double LandingLong {get;set;}
 
         public string FlightId {get;set;}
 
@@ -19,11 +19,17 @@ namespace WeatherBalloon.Cloud.Twilio
         public double DistanceToLanding {get;set;}
 
 
+        public PredictionNotification()
+        {
+
+            
+        }
+
         public PredictionNotification(PredictionDocument predictionDocument)
         {
             LandingDataTime = predictionDocument.LandingDateTime.AddHours(-7); // to arizona time
-            LandingLat = predictionDocument.LandingLat;
-            LandingLong = predictionDocument.LandingLong;
+            LandingLat = predictionDocument.Latitude;
+            LandingLong = predictionDocument.Longitude;
             FlightId = predictionDocument.FlightId;
             TrackerDevice = predictionDocument.TrackerSource;
             DistanceToLanding = predictionDocument.DistanceToLanding;

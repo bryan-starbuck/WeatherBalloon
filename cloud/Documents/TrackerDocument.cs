@@ -10,61 +10,29 @@ namespace WeatherBalloon.Cloud.Documents
     /// be written to cosmos.
     /// 
     /// </summary>
-    public class TrackerDocument
+    public class TrackerDocument : DocumentBase
     {
-        public string Type { get { return "tracker";}}
+        public override string Type { get { return "tracker";}}
 
-        public string FlightId {get;set;}
         public string DeviceName { get;set; }
-
-        public GPSLocation BalloonLocation {get;set;}
-        public GPSLocation TrackerLocation {get;set;}
-
-        public double AveAscent {get;set;}
-        public double AveDescent {get;set;}
-        public double BurstAltitude {get;set;}
-        public BalloonState State { get;set;}
-
-        public Point BalloonPointLocation {get;set;}
-
-        public Point TrackerPointLocation {get;set;}
 
         public double DistanceToBalloon {get;set;}
 
-        public string partitionid {get;set;}
-
-
-        public TrackerDocument(TrackerMessage message)
+        public static TrackerDocument Create(TrackerMessage message)
         {
-            FlightId = message.FlightId;
-            DeviceName = message.DeviceName;
-            AveAscent = message.AveAscent;
-            AveDescent = message.AveDescent;
-            BurstAltitude = message.BurstAltitude;
-            State = message.State;
-            BalloonLocation = message.BalloonLocation;
-            TrackerLocation = message.TrackerLocation;
-            partitionid = message.partitionid;
-
-            EnrichWithGeolocationData();
-        }
-
-        private void EnrichWithGeolocationData()
-        {
-            if (BalloonLocation != null)
+            return new TrackerDocument() 
             {
-                BalloonPointLocation = new Point(this.BalloonLocation.@long, this.BalloonLocation.lat);
-            }
+                Altitude = message.TrackerLocation.alt,
+                DeviceName = message.DeviceName,
+                FlightId = message.FlightId,
+                TimestampUTC = message.Timestamp,
+                partitionid = message.partitionid,
+                Latitude = message.TrackerLocation.lat,
+                Longitude = message.TrackerLocation.@long,
+                Geopoint = new Point(message.TrackerLocation.@long,message.TrackerLocation.lat)
 
-            if (TrackerLocation != null)
-            {
-                TrackerPointLocation = new Point(this.TrackerLocation.@long, this.TrackerLocation.lat);
-            }
-
-            if (( TrackerPointLocation != null) && (BalloonPointLocation != null))
-            {
-                //DistanceToBalloon = TrackerPointLocation.Distance(BalloonPointLocation);
-            }
+                // DistanceToBalloon  - todo
+            };
         }
 
     }

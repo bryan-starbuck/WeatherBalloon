@@ -11,6 +11,7 @@ using System.Text;
 
 using WeatherBalloon.Messaging;
 using System.IO;
+using WeatherBalloon.Cloud.Documents;
 
 namespace WeatherBalloon.Cloud.HabHub
 {
@@ -29,20 +30,20 @@ namespace WeatherBalloon.Cloud.HabHub
 
         }
 
-        public PredictionMessage Generate(TrackerMessage trackerMessage, ILogger log)
+        public PredictionDocument Generate(BalloonDocument balloonDocument, ILogger log)
         {
             HabHubMessage habHubMessage = new HabHubMessage();
-            habHubMessage.alt = trackerMessage.BalloonLocation.alt;
-            habHubMessage.burst = trackerMessage.BurstAltitude;
-            habHubMessage.lat = trackerMessage.BalloonLocation.lat;
-            habHubMessage.lon = trackerMessage.BalloonLocation.@long;
+            habHubMessage.alt = balloonDocument.Altitude;
+            habHubMessage.burst = balloonDocument.BurstAltitude;
+            habHubMessage.lat = balloonDocument.Latitude;
+            habHubMessage.lon = balloonDocument.Longitude;
 
-            habHubMessage.ascent = trackerMessage.AveAscent;
+            habHubMessage.ascent = balloonDocument.AveAscent;
 
             return CreateHabHubPrediction(habHubMessage).Result;
         }
 
-        private static async Task<PredictionMessage> CreateHabHubPrediction(HabHubMessage habHubMessage)
+        private static async Task<PredictionDocument> CreateHabHubPrediction(HabHubMessage habHubMessage)
         {
             // First step, tell HabHub.org to run a prediction.  This will give us a Uuid to identify the prediction
             var content = new FormUrlEncodedContent(habHubMessage.ToParameterDictionary());
@@ -93,7 +94,7 @@ namespace WeatherBalloon.Cloud.HabHub
                     var csv = getSanitizedCsv(response).Result;
                     var landingRecord = getLastRecord(csv);
 
-                    var predictionMessage = generatePredictionMessage(landingRecord);
+                    var predictionMessage = generatePrediction(landingRecord);
 
                     if (predictionMessage !=null)
                     {
@@ -156,17 +157,16 @@ namespace WeatherBalloon.Cloud.HabHub
 
         }
 
-        private static PredictionMessage generatePredictionMessage(HabHubPredictionPoint landingRecord)
+        private static PredictionDocument generatePrediction(HabHubPredictionPoint landingRecord)
         {
-            
-            var predictionMessage = new PredictionMessage();
-            predictionMessage.PredictionDate = DateTime.UtcNow;
-            predictionMessage.LandingDateTime = UnixTimeToDateTime(landingRecord.Timestamp);
-            predictionMessage.LandingLat = landingRecord.Latitude;
-            predictionMessage.LandingLong = landingRecord.Longitude;
-            predictionMessage.LandingAltitude = landingRecord.Altitude;
+            var predictionDocument = new PredictionDocument();
+            predictionDocument.TimestampUTC = DateTime.UtcNow;
+            predictionDocument.LandingDateTime = UnixTimeToDateTime(landingRecord.Timestamp);
+            predictionDocument.Latitude = landingRecord.Latitude;
+            predictionDocument.Longitude = landingRecord.Longitude;
+            predictionDocument.Altitude = landingRecord.Altitude;
 
-            return predictionMessage;
+            return predictionDocument;
         }
 
 

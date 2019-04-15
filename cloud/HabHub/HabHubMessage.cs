@@ -14,7 +14,7 @@ namespace WeatherBalloon.Cloud.HabHub
         public double burst { get; set; }
 
         // HabHub Messages must be for the future, Time will be built 5 min in the future
-        private static DateTime targetTime = DateTime.UtcNow.AddMinutes(10);        
+        private static DateTime targetTime = DateTime.UtcNow.AddMinutes(30);        
         public string hour = targetTime.ToString("HH");
         public string min = targetTime.ToString("mm");
         public string second = targetTime.ToString("ss");

@@ -18,6 +18,8 @@ using System.IO;
 
 using WeatherBalloon.Cloud.HabHub;
 using WeatherBalloon.Cloud.Documents;
+using WeatherBalloon.Cloud.Twilio;
+using Microsoft.Azure.Documents.Spatial;
 
 namespace WeatherBalloon.Cloud
 {
@@ -49,7 +51,7 @@ namespace WeatherBalloon.Cloud
 
             var queryBuilder = new StringBuilder();
             queryBuilder.Append("SELECT Top 1* FROM ");
-            queryBuilder.Append(cosmosDoc).Append(" WHERE ").Append(cosmosDoc).Append(whereVariable).Append(" = \'tracker\'");
+            queryBuilder.Append(cosmosDoc).Append(" WHERE ").Append(cosmosDoc).Append(whereVariable).Append(" = \'balloon\'");
             queryBuilder.Append(" ORDER BY ").Append(cosmosDoc).Append(orderByVariable).Append(" DESC");
 
             log.LogInformation($"Query text: {queryBuilder.ToString()}");
@@ -57,51 +59,54 @@ namespace WeatherBalloon.Cloud
             var client = new DocumentClient(new Uri(cosmosUrl), cosmosKey);
 
             FeedOptions feedOptions = new FeedOptions() { EnableCrossPartitionQuery = true };
-            //Get Tracker message from Cosmos
-            var trackerMessage =
-                client.CreateDocumentQuery<TrackerMessage>(UriFactory.CreateDocumentCollectionUri(cosmosDB, cosmosDoc), 
+            //Get latest balloon message from Cosmos
+            var balloonDocument =
+                client.CreateDocumentQuery<BalloonDocument>(UriFactory.CreateDocumentCollectionUri(cosmosDB, cosmosDoc), 
                     queryBuilder.ToString(), feedOptions).AsEnumerable().FirstOrDefault();
 
-            log.LogInformation($"Balloon state: {trackerMessage.State}");
+            log.LogInformation($"Balloon state: {balloonDocument.State}");
 
-            if (trackerMessage.State == BalloonState.PreLaunch || trackerMessage.State == BalloonState.Landed)
+            if (balloonDocument.State == BalloonState.PreLaunch || balloonDocument.State == BalloonState.Landed)
             {
                 log.LogInformation($"Balloon not in the air, no prediction calculated");
                 return;
             }
 
-            if (trackerMessage.AveAscent <= 5)
+            if (balloonDocument.AveAscent <= 5)
             {
                 // climb rate of less than 1 is a invalid in habhub
-                log.LogInformation($"Balloon Ave Ascent rate too low ({trackerMessage.AveAscent}), adjusted to 5 m/s");
-                trackerMessage.AveAscent = 5;
+                log.LogInformation($"Balloon Ave Ascent rate too low ({balloonDocument.AveAscent}), adjusted to 5 m/s");
+                balloonDocument.AveAscent = 5;
             }
 
-            if (trackerMessage.BurstAltitude > 30000)
+            if (balloonDocument.BurstAltitude > 30000)
             {
                 log.LogInformation("Balloon burst set too high, forcing to 30,000 m.");
-                trackerMessage.BurstAltitude = 30000;
+                balloonDocument.BurstAltitude = 30000;
             }
 
-            if (trackerMessage.State == BalloonState.Rising)
+            if (balloonDocument.State == BalloonState.Rising)
             {
                 try 
                 {
                     PredictionEngine predictionEngine = new PredictionEngine();
-                    var predictionMessage = predictionEngine.Generate(trackerMessage, log);
-                    if (predictionMessage != null)
-                    {
-                        predictionMessage.BalloonLocation = trackerMessage.BalloonLocation;
-                        predictionMessage.FlightId = trackerMessage.FlightId;
-                        predictionMessage.TrackerSource = trackerMessage.DeviceName;
+                    var predictionDocument = predictionEngine.Generate(balloonDocument, log);
 
-                        var predictionDocument = new PredictionDocument(predictionMessage);
+                    // enrich prediction document
+                    if (predictionDocument != null)
+                    {
+                        predictionDocument.FlightId = balloonDocument.FlightId;
+                        predictionDocument.TrackerSource = balloonDocument.TrackerSource;
+                        predictionDocument.Geopoint = new Point(predictionDocument.Longitude, predictionDocument.Latitude);
+                        predictionDocument.partitionid = balloonDocument.partitionid;
 
                         WriteDocument(predictionDocument).Wait();
 
                         try
                         {
-                            SendPredictionNotification(predictionDocument);
+                            var predictionNotification = new PredictionNotification(predictionDocument);
+
+                            SendPredictionNotification(predictionNotification);
                         }
                         catch (Exception ex)
                         {
@@ -115,18 +120,18 @@ namespace WeatherBalloon.Cloud
                     log.LogError(ex, $"Failed to generate prediction: {ex.Message}");
                 }
             }
-            else if (trackerMessage.State == BalloonState.Falling)
+            else if (balloonDocument.State == BalloonState.Falling)
             {
                 // can't create a new prediction will falling
-                var lastPredictionDocument = GetLastPrediction(trackerMessage.FlightId);
+                var lastPredictionDocument = GetLastPrediction(balloonDocument.FlightId);
                 if(lastPredictionDocument != null)
                 {
-                    // Update prediction with lastest balloon prediction
-                    lastPredictionDocument.BalloonLocation = trackerMessage.BalloonLocation;
-                    lastPredictionDocument.EnrichWithGeolocationData();
+                    lastPredictionDocument.DistanceToLanding = 10; // todo
+
+                    var notification = new PredictionNotification(lastPredictionDocument);
 
                     // notify of balloon location
-                    SendPredictionNotification(lastPredictionDocument);
+                    SendPredictionNotification(notification);
                 }
             }
         }
@@ -151,11 +156,11 @@ namespace WeatherBalloon.Cloud
         /// </summary>
         /// <param name="prediction"></param>
         /// <returns></returns>
-        private static void SendPredictionNotification(PredictionDocument prediction)
+        private static void SendPredictionNotification(PredictionNotification predictionNotification)
         {
             // todo - put this in the app properties
             var url = $"https://habservices.azurewebsites.net/api/HttpToSMSNotification?code={SMSNotificationFunctionKey}";
-            var body = JsonConvert.SerializeObject(prediction);
+            var body = JsonConvert.SerializeObject(predictionNotification);
             
             client.PostAsJsonAsync(url, body);
         }
@@ -165,8 +170,10 @@ namespace WeatherBalloon.Cloud
         /// </summary>
         /// <param name="prediction"></param>
         /// <returns></returns>
-        private static async Task WriteDocument(PredictionDocument prediction)
+        private static async Task WriteDocument<T>(T prediction) where T : DocumentBase
         {
+            // TODO - refactor this code is in two places
+
             try
             {
                 using (var client = new DocumentClient(new Uri(cosmosUrl), cosmosKey))
