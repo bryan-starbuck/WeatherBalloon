@@ -1,6 +1,5 @@
 #! /usr/bin/python
-# Written by Dan Mandle http://dan.mandle.me September 2012
-# License: GPL 2.0 
+# Data Acquisition script for GPS and BME 280
 import os
 from gps import *
 from time import *
@@ -8,8 +7,15 @@ import time
 import threading
 import json
 import requests
+
+import board
+import  busio
+import adafruit_bme280
+
+i2c = busio.I2C(board.SCL, board.SDA)
+bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
   
-gpsd = None #seting the global variable
+gpsd = None #setting the global variable
 
 os.system('clear') #clear the terminal (optional)
 
@@ -34,7 +40,7 @@ if __name__ == '__main__':
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
 
-        
+      
 
       payload = {'lat':gpsd.fix.latitude,
                  'long':gpsd.fix.longitude,
@@ -43,32 +49,17 @@ if __name__ == '__main__':
                  'speed':gpsd.fix.speed,
                  'climb':gpsd.fix.climb,
                  'track':gpsd.fix.track,
-                 'mode' :gpsd.fix.mode
+                 'mode' :gpsd.fix.mode, 
+                 'temp' :bme280.temperature,
+                 'humidity' : bme280.humidity,
+                 'pressure' : bme280.pressure
                  }
 
       print(json.dumps(payload))
       r = requests.post("http://localhost:8080/data", json=payload)
       print(r.status_code, r.reason)
 
-##      print
-##      print ' GPS reading'
-##      print '----------------------------------------'
-##      print 'latitude    ' , gpsd.fix.latitude
-##      print 'longitude   ' , gpsd.fix.longitude
-##      print 'time utc    ' , gpsd.utc,' + ', gpsd.fix.time
-##      print 'altitude (m)' , gpsd.fix.altitude
-##      print 'eps         ' , gpsd.fix.eps
-##      print 'epx         ' , gpsd.fix.epx
-##      print 'epv         ' , gpsd.fix.epv
-##      print 'ept         ' , gpsd.fix.ept
-##      print 'speed (m/s) ' , gpsd.fix.speed
-##      print 'climb       ' , gpsd.fix.climb
-##      print 'track       ' , gpsd.fix.track
-##      print 'mode        ' , gpsd.fix.mode
-##      print
-##      print 'sats        ' , gpsd.satellites
-
-      time.sleep(60) #set to whatever
+      time.sleep(60) 
   except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print "\nKilling Thread..."
     gpsp.running = False

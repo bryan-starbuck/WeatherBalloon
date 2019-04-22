@@ -1,116 +1,114 @@
 using System;
 using System.IO.Ports;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Client;
+using Newtonsoft.Json;
 
 using WeatherBalloon.Messaging;
+using WeatherBalloon.Common;
 
 namespace WeatherBalloon.SerialModule
 {
-
+    /// <summary>
+    /// IoT Module that reads and writes to the serial port
+    /// </summary>
     public class SerialModule
     {
-        private const char StartMessage = '*';
-        private const char EndMessage = '~';
+        /// <summary>
+        /// IoT Edge Input name for balloon data 
+        /// </summary>
+        public const string BalloonInputName = "balloonInput";
 
-        private const char TimeField = 't';
-        private const char StateField = 's';
-        private const char FlightField = 'f';
+        /// <summary>
+        /// IoT Edge Output name
+        /// </summary>
+        public const string SerialOutputName = "serialOutput";
 
-
-        private object TransmitLock = new object();
+        private object transmitLock = new object();
 
         private static SerialPort serialPort;
 
-        private BalloonMessage currentMessage;
+        private const int MaxMessageSize = 136;
 
-        public SerialModule()
+        private WrappedModuleClient moduleClient;
+
+        public SerialModule(WrappedModuleClient moduleClient)
         {
-
-
+            this.moduleClient = moduleClient;
         }
 
-        public void Initialize()
+        public void Initialize(string port)
         {
-            string[] ports = SerialPort.GetPortNames();             
-            Console.WriteLine("The following serial ports were found:");
-            // Display each port name to the console.             
-            foreach(string port in ports)
+            if (serialPort != null && serialPort.IsOpen())
             {
-                Console.WriteLine(port); 
+                serialPort.RtsEnable = false;
+                serialPort.Close();
             }
 
             serialPort = new SerialPort(port, 115200);
+            serialPort.RtsEnable = true;
 
-            //serialPort = new SerialPortInput();
-
-            // Listen to Serial Port events
-            // serialPort.ConnectionStatusChanged += delegate(object sender, ConnectionStatusChangedEventArgs args) 
-            // {
-            //     Console.WriteLine("Connected = {0}", args.Connected);
-            // };
-
-            // serialPort.MessageReceived += delegate(object sender, MessageReceivedEventArgs args)
-            // {
-                
-            //     ProcessSerialMessage(BitConverter.ToString(args.Data));
-            // };
-
-            // Set port options
-            //serialPort.SetPort("/dev/ttyUSB0", 115200);
-
-            // Connect the serial port
-            //serialPort.Connect();
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceived);
+            
+            serialPort.Open();
         }
 
         public void OnReceive(BalloonMessage message)
         {
-            lock (TransmitLock)
+            var compactMessage = message.ToCompactMessage();
+
+            if (compactMessage.Length > MaxMessageSize)
             {
-                TransmitSerialMessage(StartMessage.ToString());
-                TransmitSerialMessage(String.Format("{0}=|{1}", TimeField, message.Timestamp));
-                TransmitSerialMessage(String.Format("{0}=|{1}", FlightField.ToString(), message.FlightId));
-                TransmitSerialMessage(String.Format("{0}=|{1}", StateField.ToString(), message.State));
-                TransmitSerialMessage(EndMessage.ToString());
+                Logger.LogWarning("Max message size exceeded: "+compactMessage);
             }
 
-
-        }
-
-        private void ProcessSerialMessage(string message)
-        {
-            Console.WriteLine("Received message: {0}", message);
-
-            var parameters = message.Split("=");
-            string key = parameters[0];
-            string value = parameters[1];
-
-            switch (key[0])
+            lock (transmitLock)
             {
-                case StartMessage : currentMessage = new BalloonMessage();
-                    break;
-                
-                // case StateField : currentMessage.State = value;
-                //     break;
-                case FlightField : currentMessage.FlightId = value;
-                    break;
-                //case TimeField : currentMessage.Timestamp = new DateTime(value);
-                //    break;
-
-                case EndMessage :  SendBalloonMessage (currentMessage);
-                    break;
+                serialPort.WriteLine(compactMessage);
             }
         }
 
-        private void TransmitSerialMessage(string message)
+        private void DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            //serialPort.SendMessage(message);
+            SerialPort sp = (SerialPort)sender;
+            string receivedData = sp.ReadExisting();
+
+            Logger.LogInfo("SerialData : "+receivedData);
+
+            if (!String.IsNullOrEmpty(receivedData))
+            {
+                try 
+                {
+                    var balloonMessage = BalloonMessage.FromCompactMessage(receivedData);
+                    SendBalloonMessage(balloonMessage);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Failed to process serial message: "+ ex.Message);
+                }
+            }
         }
 
-        private void SendBalloonMessage(BalloonMessage balloonMessage)
+    
+        private async Task<bool> SendBalloonMessage(BalloonMessage balloonMessage)
         {
-            
+            Message message = new Message(balloonMessage.ToRawBytes());
 
+            try 
+            {
+                await moduleClient.SendEventAsync(SerialOutputName, message);
+        
+                Logger.LogInfo($"transmitted message: {JsonConvert.SerializeObject(balloonMessage)}.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Failed to transmit iot message. Exception: {ex.Message}");
+                return false;
+            }
+
+            return true;
         }
-
     }
 }
 

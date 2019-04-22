@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "starbuck.azurecr.io/ingestionmodule",
+        "repository": "starbucktest2.azurecr.io/ingestionmodule",
         "tag": {
             "version": "0.0.14",
             "platforms": {

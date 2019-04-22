@@ -9,10 +9,15 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 
+using WeatherBalloon.Common;
+using WeatherBalloon.Messaging;
+
 namespace WeatherBalloon.SerialModule
 {
     class Program
     {
+        private static SerialModule serialModule;
+
         static void Main(string[] args)
         {
             Init().Wait();
@@ -48,37 +53,33 @@ namespace WeatherBalloon.SerialModule
             await ioTHubModuleClient.OpenAsync();
             Console.WriteLine("IoT Hub module client initialized.");
 
-            // Register callback to be called when a message is received by the module
-            await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", PipeMessage, ioTHubModuleClient);
+            serialModule = new SerialModule(new WrappedModuleClient(ioTHubModuleClient));
+            serialModule.Initialize("COM4");  // todo
+
+           // Register callback to be called when a message is received by the module
+            await ioTHubModuleClient.SetInputMessageHandlerAsync(SerialModule.BalloonInputName, ProcessBalloonMessage, ioTHubModuleClient);
         }
 
-        /// <summary>
-        /// This method is called whenever the module is sent a message from the EdgeHub. 
-        /// It just pipe the messages without any change.
-        /// It prints all the incoming messages.
+
+         /// <summary>
+        /// Process input message from the Telemetry input message source.
         /// </summary>
-        static async Task<MessageResponse> PipeMessage(Message message, object userContext)
+        static async Task<MessageResponse> ProcessBalloonMessage(Message message, object userContext)
         {
-
-            var moduleClient = userContext as ModuleClient;
-            if (moduleClient == null)
+            await Task.Run( () => 
             {
-                throw new InvalidOperationException("UserContext doesn't contain " + "expected values");
-            }
-
-            byte[] messageBytes = message.GetBytes();
-            string messageString = Encoding.UTF8.GetString(messageBytes);
-            
-            if (!string.IsNullOrEmpty(messageString))
-            {
-                var pipeMessage = new Message(messageBytes);
-                foreach (var prop in message.Properties)
+                try 
                 {
-                    pipeMessage.Properties.Add(prop.Key, prop.Value);
+                    var balloonMessage = MessageHelper.ParseMessage<BalloonMessage>(message);
+                    serialModule.OnReceive(balloonMessage);
+                    Logger.LogInfo("Balloon Message Processed.");
                 }
-                await moduleClient.SendEventAsync("output1", pipeMessage);
-                Console.WriteLine("Received message sent");
-            }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+                }
+            });
+
             return MessageResponse.Completed;
         }
     }
