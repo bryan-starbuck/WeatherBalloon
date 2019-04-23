@@ -25,6 +25,14 @@ namespace WeatherBalloon.Cloud.Documents
 
         public string TrackerSource {get;set;}
 
+        public double Temperature {get;set;}
+
+        public double Humidity {get;set;}
+
+        public double Pressure {get;set;}
+
+        public double SignalStrength {get;set;}
+
         public static BalloonDocument Create(TrackerMessage message)
         {
             return new BalloonDocument()
@@ -45,7 +53,11 @@ namespace WeatherBalloon.Cloud.Documents
                 Longitude = message.BalloonLocation.@long,
                 Altitude = message.BalloonLocation.alt,
                 Geopoint = new Point(message.BalloonLocation.@long,message.BalloonLocation.lat),
-                TrackerSource = message.DeviceName
+                TrackerSource = message.DeviceName,
+                Humidity = message.Humidity,
+                Pressure = message.Pressure,
+                Temperature = message.Temperature,
+                SignalStrength = message.SignalStrength
             };
 
         }

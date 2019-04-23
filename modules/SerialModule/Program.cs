@@ -8,6 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
+using System.Collections.Generic;     
+using Microsoft.Azure.Devices.Shared; // For TwinCollection
+using Newtonsoft.Json;
 
 using WeatherBalloon.Common;
 using WeatherBalloon.Messaging;
@@ -17,6 +20,7 @@ namespace WeatherBalloon.SerialModule
     class Program
     {
         private static SerialModule serialModule;
+        private static string comPort;
 
         static void Main(string[] args)
         {
@@ -53,13 +57,49 @@ namespace WeatherBalloon.SerialModule
             await ioTHubModuleClient.OpenAsync();
             Console.WriteLine("IoT Hub module client initialized.");
 
-            serialModule = new SerialModule(new WrappedModuleClient(ioTHubModuleClient));
-            serialModule.Initialize("COM4");  // todo
+            // Read the COM Port value from the module twin's desired properties
+            var moduleTwin = await ioTHubModuleClient.GetTwinAsync();
+            await OnDesiredPropertiesUpdate(moduleTwin.Properties.Desired, ioTHubModuleClient);
 
-           // Register callback to be called when a message is received by the module
+            // Attach a callback for updates to the module twin's desired properties.
+            await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertiesUpdate, null);
+
+            serialModule = new SerialModule();
+            await serialModule.Initialize(comPort);
+
+            // Register callback to be called when a message is received by the module
             await ioTHubModuleClient.SetInputMessageHandlerAsync(SerialModule.BalloonInputName, ProcessBalloonMessage, ioTHubModuleClient);
         }
 
+        private static Task OnDesiredPropertiesUpdate(TwinCollection desiredProperties, object userContext)
+        {
+            try
+            {
+                Console.WriteLine("Desired property change:");
+                Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
+
+                if (desiredProperties["ComPort"] != null)
+                {
+                    comPort = desiredProperties["ComPort"].ToString();
+
+                    Logger.LogInfo("Comport set as ComPort: " + comPort);
+                }
+            }
+            catch (AggregateException ex)
+            {
+                foreach (Exception exception in ex.InnerExceptions)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Error when receiving desired property: {0}", exception);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Error when receiving desired property: {0}", ex.Message);
+            }
+            return Task.CompletedTask;
+        }
 
          /// <summary>
         /// Process input message from the Telemetry input message source.

@@ -40,8 +40,6 @@ if __name__ == '__main__':
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
 
-      
-
       payload = {'lat':gpsd.fix.latitude,
                  'long':gpsd.fix.longitude,
                 'time': str(gpsd.utc),

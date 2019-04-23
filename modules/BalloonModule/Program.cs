@@ -21,6 +21,8 @@ namespace WeatherBalloon.BalloonModule
         private static Timer transmitTimer;
         private const int transmitInterval = 60000;
 
+        private static WrappedModuleClient moduleClient;
+
         static void Main(string[] args)
         {
             Init().Wait();
@@ -48,37 +50,37 @@ namespace WeatherBalloon.BalloonModule
         /// </summary>
         static async Task Init()
         {
-            // Use Mqtt as it is more reliable than ampq 
-            MqttTransportSettings mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
-            ITransportSettings[] settings = { mqttSetting };
-
-            // Open a connection to the Edge runtime
-            ModuleClient ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
-            await ioTHubModuleClient.OpenAsync();
-            Console.WriteLine("IoT Hub module client initialized.");
+            moduleClient = await WrappedModuleClient.Create();
+            Logger.LogInfo("Created and connected Module Client. ");
 
             // Register callback to be called when a message is received by the module
-            await ioTHubModuleClient.SetInputMessageHandlerAsync(BalloonModule.TelemetryInputName, ProcessTelemetry, ioTHubModuleClient);
+            await moduleClient.moduleClient.SetInputMessageHandlerAsync(BalloonModule.TelemetryInputName, ProcessTelemetry, moduleClient.moduleClient);
 
-            transmitTimer = new Timer(TransmitTimerCallback, new WrappedModuleClient(ioTHubModuleClient),  transmitInterval, transmitInterval);
+            transmitTimer = new Timer(TransmitTimerCallback, null,  transmitInterval, transmitInterval);
         }
 
         /// <summary>
         /// Process input message from the Telemetry input message source.
         /// </summary>
-        static async Task<MessageResponse> ProcessTelemetry(Message message, object userContext)
+        private static async Task<MessageResponse> ProcessTelemetry(Message message, object userContext)
         {
             await Task.Run( () => 
             {
                 try 
                 {
-                    var gpsMessage = MessageHelper.ParseMessage<GPSMessage>(message);
-                    balloonModule.Receive(gpsMessage);
-                    Logger.LogInfo("GPS Message Processed.");
+
+                    byte[] messageBytes = message.GetBytes();
+                    string messageString = Encoding.UTF8.GetString(messageBytes);
+                    
+
+                    var telemetryMessage = JsonConvert.DeserializeObject<TelemetryMessage>(messageString);
+
+                    balloonModule.Receive(telemetryMessage);
+                    Logger.LogInfo("Telemetry Message Processed.");
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+                    Logger.LogWarning("Invalid Telemetry message ex: "+ ex.Message);
                 }
             });
 
@@ -87,14 +89,13 @@ namespace WeatherBalloon.BalloonModule
 
         private static void TransmitTimerCallback(object state)
         {
-            var wrappedModuleClient = state as WrappedModuleClient;
-            if ( wrappedModuleClient == null)
+            if ( moduleClient == null)
             {
                 Logger.LogFatalError("Invalid Module client in Transmit Timer.");
                 return;
             }
 
-            balloonModule.TransmitBalloonMessage(wrappedModuleClient).Wait();
+            balloonModule.TransmitBalloonMessage(moduleClient).Wait();
         }
     }
 }

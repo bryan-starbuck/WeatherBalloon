@@ -33,14 +33,16 @@ namespace WeatherBalloon.SerialModule
 
         private WrappedModuleClient moduleClient;
 
-        public SerialModule(WrappedModuleClient moduleClient)
+        public SerialModule()
         {
-            this.moduleClient = moduleClient;
+            
         }
 
-        public void Initialize(string port)
+        public async Task<bool> Initialize(string port)
         {
-            if (serialPort != null && serialPort.IsOpen())
+            moduleClient = await WrappedModuleClient.Create();
+
+            if (serialPort != null && serialPort.IsOpen)
             {
                 serialPort.RtsEnable = false;
                 serialPort.Close();
@@ -49,9 +51,11 @@ namespace WeatherBalloon.SerialModule
             serialPort = new SerialPort(port, 115200);
             serialPort.RtsEnable = true;
 
-            serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceived);
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
             
             serialPort.Open();
+
+            return true;
         }
 
         public void OnReceive(BalloonMessage message)
@@ -69,19 +73,25 @@ namespace WeatherBalloon.SerialModule
             }
         }
 
-        private void DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
             string receivedData = sp.ReadExisting();
 
             Logger.LogInfo("SerialData : "+receivedData);
 
+            if (receivedData.StartsWith('-'))
+            {
+                // ignore, debug messages.
+                return;
+            }
+
             if (!String.IsNullOrEmpty(receivedData))
             {
                 try 
                 {
                     var balloonMessage = BalloonMessage.FromCompactMessage(receivedData);
-                    SendBalloonMessage(balloonMessage);
+                    SendBalloonMessage(balloonMessage).Wait();
                 }
                 catch (Exception ex)
                 {

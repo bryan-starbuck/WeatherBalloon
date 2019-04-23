@@ -16,6 +16,10 @@ namespace WeatherBalloon.Messaging
         public double AveDescent {get;set;}
         public double BurstAltitude {get;set;}
         public BalloonState State { get;set;}
+        public double Humidity {get;set;}
+        public double Temperature {get;set;}
+        public double Pressure {get;set;}
+        public double SignalStrength {get;set;}
 
     }
 

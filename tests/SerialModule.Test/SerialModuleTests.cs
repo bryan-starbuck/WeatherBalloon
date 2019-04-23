@@ -52,6 +52,45 @@ namespace SerialModule.Test
             serializedBalloonMessage.Humidity.ShouldBe(balloonMessage.Humidity);
         }
 
+        [Fact]
+        public void SignalStrengthTest()
+        {
+            // arrange
+            var balloonMessage = CreateBalloonMessage();
+            
+
+            // act
+            var compactMessageString = balloonMessage.ToCompactMessage();
+            compactMessageString += ":-97.1";
+            output.WriteLine("Compact: "+compactMessageString);
+            var jsonMessage = JsonConvert.SerializeObject(balloonMessage);
+            output.WriteLine(jsonMessage);
+            
+
+            var serializedBalloonMessage = BalloonMessage.FromCompactMessage(compactMessageString);
+            var jsonResultMessage = JsonConvert.SerializeObject(serializedBalloonMessage);
+            output.WriteLine(jsonResultMessage);
+            
+
+            // verify
+            serializedBalloonMessage.SignalStrength.ShouldBe(-97.1);
+        }
+
+        // [Fact]
+        // public void ParseTestMessage()
+        // {
+        //     // arrange
+        //     var compactMessageString = "155605809220.020.00030000213.37008068.07469000352.50126.825.6969.6Attractive dart:-74";
+
+        //     //When
+        //     var serializedBalloonMessage = BalloonMessage.FromCompactMessage(compactMessageString);
+        //     var jsonResultMessage = JsonConvert.SerializeObject(serializedBalloonMessage);
+        //     output.WriteLine(jsonResultMessage);
+        
+        //     //Then
+        //     10.ShouldBe(1);
+        // }
+
 
         private BalloonMessage CreateBalloonMessage()
         {

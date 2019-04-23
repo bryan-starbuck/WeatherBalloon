@@ -2,8 +2,6 @@ FROM mcr.microsoft.com/dotnet/core/runtime:3.0-stretch-slim-arm32v7
 WORKDIR /app
 COPY bin/Debug/netcoreapp3.0/publish ./
 
-FROM resin/rpi-raspbian
-
 USER root
 
 ENTRYPOINT ["dotnet", "SerialModule.dll"]

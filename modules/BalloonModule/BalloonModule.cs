@@ -71,7 +71,7 @@ namespace WeatherBalloon.BalloonModule
         /// <summary>
         /// Current location according to the most recent gps message
         /// </summary>
-        public GPSLocation Location;
+        public GPSLocation Location = new GPSLocation();
 
         /// <summary>
         /// number of data points seen with a rising climb
@@ -87,6 +87,10 @@ namespace WeatherBalloon.BalloonModule
 
         private string FlightId;
 
+        private double Temperature {get;set; }
+        private double Humidity { get;set; }
+        private double Pressure { get;set; }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -99,13 +103,24 @@ namespace WeatherBalloon.BalloonModule
         /// Receive new GPS information
         /// </summary>
         /// <param name="message"></param>
-        public void Receive(GPSMessage message)
+        public void Receive(TelemetryMessage message)
         {
             lock (lockingUpdateObject)
             {
-                Location = message.Location;
+                Location.alt = message.alt;
+                Location.climb = message.climb;
+                Location.lat = message.lat;
+                Location.@long = message.@long;
+                Location.mode = message.mode;
+                Location.speed = message.speed;
+                Location.time = message.time;
+                Location.track = message.track;
 
-                var newState = DetermineNewState(BalloonState, message.Location);
+                Temperature = message.temp;
+                Humidity = message.humidity;
+                Pressure = message.pressure;
+
+                var newState = DetermineNewState(BalloonState, Location);
 
                 if (newState != BalloonState)
                 {
@@ -114,7 +129,7 @@ namespace WeatherBalloon.BalloonModule
                     {
                         Logger.LogInfo("Burst DETECTED!!!");
 
-                        BurstAltitude = message.Location.alt;
+                        BurstAltitude = Location.alt;
                     }
 
                     Logger.LogInfo($"Transitioned Balloon State. From: {BalloonState} To: {newState}");
@@ -125,14 +140,16 @@ namespace WeatherBalloon.BalloonModule
                 if (BalloonState == BalloonState.Rising)
                 {
                     ascentDataPoints++;
-                    AverageAscent = ((ascentDataPoints - 1) / ascentDataPoints) * AverageAscent + (message.Location.climb/ascentDataPoints);
+                    AverageAscent = ((ascentDataPoints - 1) / ascentDataPoints) * AverageAscent + (Location.climb/ascentDataPoints);
                 
                 } 
                 else if (BalloonState == BalloonState.Falling)
                 {
                     descentDataPoints++;
-                    AverageDescent = ((descentDataPoints - 1) / descentDataPoints) * AverageDescent + (message.Location.climb/descentDataPoints);
+                    AverageDescent = ((descentDataPoints - 1) / descentDataPoints) * AverageDescent + (Location.climb/descentDataPoints);
                 }  
+
+
             }
         }
 
@@ -214,7 +231,10 @@ namespace WeatherBalloon.BalloonModule
                 AveAscent = AverageAscent,
                 AveDescent = AverageDescent,
                 BurstAltitude = BurstAltitude,
-                State = BalloonState 
+                State = BalloonState, 
+                Humidity = this.Humidity,
+                Temperature = this.Temperature, 
+                Pressure = this.Pressure
             };
         }
     }

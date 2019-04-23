@@ -80,7 +80,11 @@ namespace WeatherBalloon.TrackerModule
                 AveDescent = message.AveDescent,
                 BurstAltitude = message.BurstAltitude,
                 DeviceName = this.DeviceName,
-                FlightId = message.FlightId
+                FlightId = message.FlightId,
+                Humidity = message.Humidity,
+                Temperature = message.Temperature,
+                Pressure = message.Pressure,
+                SignalStrength = message.SignalStrength
             };
 
             try 

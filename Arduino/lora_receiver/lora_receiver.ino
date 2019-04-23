@@ -86,7 +86,7 @@ void setup()
   }
   delay(100);
  
-  Serial.println("Feather LoRa RX Test!");
+  Serial.println("-Feather LoRa RX Test!");
  
   // manual reset
   digitalWrite(RFM95_RST, LOW);
@@ -95,17 +95,17 @@ void setup()
   delay(10);
  
   while (!rf95.init()) {
-    Serial.println("LoRa radio init failed");
+    Serial.println("-LoRa radio init failed");
     while (1);
   }
-  Serial.println("LoRa radio init OK!");
+  Serial.println("-LoRa radio init OK!");
  
   // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
   if (!rf95.setFrequency(RF95_FREQ)) {
-    Serial.println("setFrequency failed");
+    Serial.println("-setFrequency failed");
     while (1);
   }
-  Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+  Serial.print("-Set Freq to: "); Serial.println(RF95_FREQ);
  
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
  
@@ -128,16 +128,16 @@ void loop()
       buf[len] = '\0';
       
       digitalWrite(LED, HIGH);
-      //RH_RF95::printBuffer("Received: ", buf, len);
-      Serial.println((char*)buf);
-      Serial.print("RSSI: ");
+      Serial.print((char*)buf);
+      // Add the received signal strength to the end of the message.
+      Serial.print(":");
       Serial.println(rf95.lastRssi(), DEC);
  
       // Send a reply
-      uint8_t data[] = "ack!";
-      rf95.send(data, sizeof(data));
-      rf95.waitPacketSent();
-      digitalWrite(LED, LOW);
+      //uint8_t data[] = "ack!";
+      //rf95.send(data, sizeof(data));
+      //rf95.waitPacketSent();
+      //digitalWrite(LED, LOW);
     }
     else
     {

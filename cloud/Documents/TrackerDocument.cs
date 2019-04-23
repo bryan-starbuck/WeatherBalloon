@@ -6,7 +6,7 @@ using Microsoft.Azure.Documents.Spatial;
 namespace WeatherBalloon.Cloud.Documents
 {
     /// <summary>
-    /// This is a data object representing the Tracker Message that will 
+    /// This is a data object representing the Tracker data that will 
     /// be written to cosmos.
     /// 
     /// </summary>

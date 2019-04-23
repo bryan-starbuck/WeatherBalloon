@@ -80,6 +80,16 @@
               "image": "${MODULES.SerialModule}",
               "createOptions": {}
             }
+          },
+          "TestModule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.TestModule}",
+              "createOptions": {}
+            }
           }
         }
       }
@@ -89,7 +99,8 @@
         "schemaVersion": "1.0",
         "routes": {
           "DataIngestionModuleToIoTHub": "FROM /messages/modules/IngestionModule/outputs/output INTO $upstream",
-          "SerialModuleToIoTHub": "FROM /messages/modules/SerialModule/outputs/* INTO $upstream"
+          "SerialModuleToIoTHub": "FROM /messages/modules/SerialModule/outputs/* INTO $upstream",
+          "TestModuleToIoTHub": "FROM /messages/modules/TestModule/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

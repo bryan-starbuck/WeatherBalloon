@@ -22,12 +22,17 @@ namespace WeatherBalloon.Messaging
         public double Humidity {get;set;}
         public double Pressure {get;set;}
 
+         // Lora Signal strength indicator
+        public double SignalStrength { get;set; }
+
         // to convert values to unsigned use the following offsets
         public const double latitude_offset = 180;
         public const double longitude_offset = 180;
 
         public const double ascent_offset = 20;
         public const double temperature_offset = 100;
+
+       
 
         public string ToCompactMessage()
         {
@@ -77,7 +82,19 @@ namespace WeatherBalloon.Messaging
                 balloonMessage.Temperature = Math.Round(float.Parse(message.Substring(52,5)) - BalloonMessage.temperature_offset, 1);
                 balloonMessage.Humidity = Math.Round(float.Parse(message.Substring(57,4)), 1);
                 balloonMessage.Pressure = Math.Round(float.Parse(message.Substring(61,5)), 1);
-                balloonMessage.FlightId = message.Substring(66);
+                
+                // The Signal Strength appears at the end of the message
+                int position = message.IndexOf(":");
+                if ( position > 0)
+                {
+                    balloonMessage.FlightId = message.Substring(66, position - 66);
+                    balloonMessage.SignalStrength = Math.Round(float.Parse(message.Substring(position+1)), 1);
+                }
+                else 
+                {   
+                    balloonMessage.FlightId = message.Substring(66);
+                }
+                
             }
             catch (Exception ex)
             {
