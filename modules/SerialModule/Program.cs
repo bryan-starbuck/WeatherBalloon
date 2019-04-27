@@ -58,14 +58,14 @@ namespace WeatherBalloon.SerialModule
             Console.WriteLine("IoT Hub module client initialized.");
 
             // Read the COM Port value from the module twin's desired properties
-            var moduleTwin = await ioTHubModuleClient.GetTwinAsync();
-            await OnDesiredPropertiesUpdate(moduleTwin.Properties.Desired, ioTHubModuleClient);
+            // var moduleTwin = await ioTHubModuleClient.GetTwinAsync();
+            // await OnDesiredPropertiesUpdate(moduleTwin.Properties.Desired, ioTHubModuleClient);
 
             // Attach a callback for updates to the module twin's desired properties.
-            await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertiesUpdate, null);
+            //await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertiesUpdate, null);
 
             serialModule = new SerialModule();
-            await serialModule.Initialize(comPort);
+            await serialModule.Initialize();
 
             // Register callback to be called when a message is received by the module
             await ioTHubModuleClient.SetInputMessageHandlerAsync(SerialModule.BalloonInputName, ProcessBalloonMessage, ioTHubModuleClient);

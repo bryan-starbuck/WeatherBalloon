@@ -31,7 +31,7 @@ namespace WeatherBalloon.Cloud
         private static string cosmosDoc = Environment.GetEnvironmentVariable("CosmosDoc");
 
         [FunctionName("HubToCosmos")]
-        public static void Run([IoTHubTrigger("messages/events", Connection = "IoTConn")]EventData message, ILogger log)
+        public static void Run([IoTHubTrigger("messages/events", Connection = "IoTConn", ConsumerGroup ="azurefunction")]EventData message, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 

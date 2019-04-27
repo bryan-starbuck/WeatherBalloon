@@ -1,0 +1,18 @@
+{
+    "HostConfig": 
+    {
+        "Binds": [
+            "/balloon_data:/balloon_data"
+        ]
+    },
+    "Mounts": [
+    {
+        "Name": "balloon_data",
+        "Type": "bind",
+        "Source": "/balloon_data",
+        "Destination": "/balloon_data",
+        "Mode": "",
+        "RW": true
+    }]
+    
+}

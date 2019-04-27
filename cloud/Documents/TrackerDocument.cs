@@ -22,14 +22,14 @@ namespace WeatherBalloon.Cloud.Documents
         {
             return new TrackerDocument() 
             {
-                Altitude = message.TrackerLocation.alt,
+                Altitude = (message.TrackerLocation != null) ? message.TrackerLocation.alt : 0,
                 DeviceName = message.DeviceName,
                 FlightId = message.FlightId,
                 TimestampUTC = message.Timestamp,
                 partitionid = message.partitionid,
-                Latitude = message.TrackerLocation.lat,
-                Longitude = message.TrackerLocation.@long,
-                Geopoint = new Point(message.TrackerLocation.@long,message.TrackerLocation.lat)
+                Latitude =  (message.TrackerLocation != null) ? message.TrackerLocation.lat : 0,
+                Longitude =  (message.TrackerLocation != null) ? message.TrackerLocation.@long : 0,
+                Geopoint =  (message.TrackerLocation != null) ? new Point(message.TrackerLocation.@long,message.TrackerLocation.lat) : null
 
                 // DistanceToBalloon  - todo
             };

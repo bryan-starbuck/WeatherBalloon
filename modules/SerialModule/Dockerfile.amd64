@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:3.0-runtime-stretch-slim
+FROM mcr.microsoft.com/dotnet/core/runtime:3.0
 WORKDIR /app
 COPY bin/Debug/netcoreapp3.0/publish ./
 

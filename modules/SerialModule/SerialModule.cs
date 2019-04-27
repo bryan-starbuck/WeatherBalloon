@@ -38,24 +38,46 @@ namespace WeatherBalloon.SerialModule
             
         }
 
-        public async Task<bool> Initialize(string port)
+        public async Task<bool> Initialize()
         {
             moduleClient = await WrappedModuleClient.Create();
 
-            if (serialPort != null && serialPort.IsOpen)
+            var acm0 = OpenSerialPort("/dev/ttyACM0");
+            if (acm0 != null)
             {
-                serialPort.RtsEnable = false;
-                serialPort.Close();
+                Logger.LogInfo("Successfully opened /dev/ACM0");
+                serialPort = acm0;
+            }
+            else
+            {
+                Logger.LogInfo("ACM0 not available, opening serial port ACM1");
+                var acm1 = OpenSerialPort("/dev/ttyACM1");
+                if (acm1 != null)
+                {
+                    Logger.LogInfo("Successfully opened /dev/ACM1");
+                    serialPort = acm1;
+                }
             }
 
-            serialPort = new SerialPort(port, 115200);
-            serialPort.RtsEnable = true;
-
-            serialPort.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
-            
-            serialPort.Open();
-
             return true;
+        }
+
+        public SerialPort OpenSerialPort(string port)
+        {
+            try 
+            {
+                var newSerialPort = new SerialPort(port, 115200);
+                newSerialPort.RtsEnable = true;
+
+                newSerialPort.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
+                
+                newSerialPort.Open();
+                return newSerialPort;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         public void OnReceive(BalloonMessage message)
@@ -76,7 +98,8 @@ namespace WeatherBalloon.SerialModule
         private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
-            string receivedData = sp.ReadExisting();
+            //string receivedData = sp.ReadExisting();
+            string receivedData = sp.ReadLine();
 
             Logger.LogInfo("SerialData : "+receivedData);
 
@@ -96,6 +119,7 @@ namespace WeatherBalloon.SerialModule
                 catch (Exception ex)
                 {
                     Logger.LogError("Failed to process serial message: "+ ex.Message);
+                    Logger.LogInfo("Bad serial message: "+receivedData);
                 }
             }
         }

@@ -50,7 +50,17 @@ namespace WeatherBalloon.BalloonModule
         /// </summary>
         static async Task Init()
         {
-            moduleClient = await WrappedModuleClient.Create();
+            try 
+            {
+                moduleClient = await WrappedModuleClient.Create();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogFatalError("Failed to create module client: "+ex.Message);
+            
+                // todo - basically need to exit module
+            }
+
             Logger.LogInfo("Created and connected Module Client. ");
 
             // Register callback to be called when a message is received by the module
