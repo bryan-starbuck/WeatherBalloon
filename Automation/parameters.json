@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_BalloonServices_name": {
+            "value": null
+        },
+        "IotHubs_starbucktest_name": {
+            "value": null
+        },
+        "components_BalloonServices_name": {
+            "value": null
+        },
+        "storageAccounts_weatherballoon_name": {
+            "value": null
+        },
+        "serverfarms_WestUSLinuxDynamicPlan_name": {
+            "value": null
+        },
+        "storageAccounts_balloonservices_name": {
+            "value": null
+        },
+        "databaseAccounts_weatherballoon_name": {
+            "value": null
+        },
+        "alertrules_Failure_Anomalies___BalloonServices_name": {
+            "value": null
+        }
+    }
+}
