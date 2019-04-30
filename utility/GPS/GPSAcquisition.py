@@ -1,5 +1,9 @@
 #! /usr/bin/python
 # Data Acquisition script for GPS and BME 280
+# installed to run on startup: 
+# crontab -e
+# @reboot python3 /home/pi/Documents/GPSAcquisition.py > /balloon_data/gps-log.txt &
+
 import os
 from gps import *
 from time import *
@@ -34,20 +38,21 @@ class GpsPoller(threading.Thread):
 
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
-  try:
-    gpsp.start() # start it up
-    while True:
+  gpsp.start() # start it up
+
+  while True:
+    try:
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
 
-      payload = {'lat':gpsd.fix.latitude,
-                 'long':gpsd.fix.longitude,
+      payload = {'lat':gpsd.fix.latitude if not math.isnan(gpsd.fix.latitude) else 0,
+                 'long':gpsd.fix.longitude if not math.isnan(gpsd.fix.longitude) else 0,
                 'time': str(gpsd.utc),
-                 'alt':gpsd.fix.altitude,
-                 'speed':gpsd.fix.speed,
-                 'climb':gpsd.fix.climb,
-                 'track':gpsd.fix.track,
-                 'mode' :gpsd.fix.mode, 
+                 'alt':gpsd.fix.altitude if not math.isnan(gpsd.fix.altitude) else 0,
+                 'speed':gpsd.fix.speed if not math.isnan(gpsd.fix.speed) else 0,
+                 'climb':gpsd.fix.climb if not math.isnan(gpsd.fix.climb) else 0,
+                 'track':gpsd.fix.track if not math.isnan(gpsd.fix.track) else 0,
+                 'mode' :gpsd.fix.mode,
                  'temp' :bme280.temperature,
                  'humidity' : bme280.humidity,
                  'pressure' : bme280.pressure
@@ -56,12 +61,15 @@ if __name__ == '__main__':
       print(json.dumps(payload))
       r = requests.post("http://localhost:8080/data", json=payload)
       print(r.status_code, r.reason)
+      time.sleep(60)
+    except requests.exceptions.RequestException as e:
+      print(e)
+      time.sleep(60)
+    except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
+      print("\nKilling Thread...")
+      exit(1)
 
-      time.sleep(60) 
-  except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
-    print "\nKilling Thread..."
-    gpsp.running = False
-    gpsp.join() # wait for the thread to finish what it's doing
-  print "Done.\nExiting."
+      gpsp.running = False
+      gpsp.join() # wait for the thread to finish what it's doing
 
-
+  print ("Done.\nExiting.")
