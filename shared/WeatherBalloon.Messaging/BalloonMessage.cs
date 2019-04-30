@@ -31,6 +31,8 @@ namespace WeatherBalloon.Messaging
 
         public const double ascent_offset = 20;
         public const double temperature_offset = 100;
+        public const double climb_offset = 10;
+        public const double speed_offset = 50;
 
        
 
@@ -41,7 +43,7 @@ namespace WeatherBalloon.Messaging
             // unix time 10 digits
             // 
 
-            return string.Format("{0,0000000000}{1:00.0}{2:00.0}{3}{4:000000}{5:000.00000}{6:000.00000}{7:000000.00}{8:000.0}{9:00.0}{10:000.0}{11}",
+            return string.Format("{0,0000000000}{1:00.0}{2:00.0}{3}{4:000000}{5:000.00000}{6:000.00000}{7:000000.00}{8:00.00}{9:00.0}{10:000.0}{11:00.0}{12:000.0}{13}",
                 unixTimestamp,
                 AveAscent+BalloonMessage.ascent_offset,
                 AveDescent+BalloonMessage.ascent_offset,
@@ -50,6 +52,8 @@ namespace WeatherBalloon.Messaging
                 Location.lat+BalloonMessage.latitude_offset, 
                 Location.@long+BalloonMessage.longitude_offset, 
                 Location.alt,
+                Location.climb + BalloonMessage.climb_offset,
+                Location.speed + BalloonMessage.speed_offset,
                 Temperature + BalloonMessage.temperature_offset,
                 Humidity,
                 Pressure,
@@ -79,20 +83,23 @@ namespace WeatherBalloon.Messaging
                 balloonMessage.Location.lat = Math.Round(float.Parse(message.Substring(25, 9)) - BalloonMessage.latitude_offset, 5);
                 balloonMessage.Location.@long = Math.Round(float.Parse(message.Substring(34, 9)) - BalloonMessage.longitude_offset, 5);
                 balloonMessage.Location.alt = float.Parse(message.Substring(43, 9));
-                balloonMessage.Temperature = Math.Round(float.Parse(message.Substring(52,5)) - BalloonMessage.temperature_offset, 1);
-                balloonMessage.Humidity = Math.Round(float.Parse(message.Substring(57,4)), 1);
-                balloonMessage.Pressure = Math.Round(float.Parse(message.Substring(61,5)), 1);
+                balloonMessage.Location.climb = Math.Round(float.Parse(message.Substring(52, 5)) - BalloonMessage.climb_offset, 2);
+                balloonMessage.Location.speed = Math.Round(float.Parse(message.Substring(57, 4)) - BalloonMessage.speed_offset, 1);
+
+                balloonMessage.Temperature = Math.Round(float.Parse(message.Substring(61,5)) - BalloonMessage.temperature_offset, 1);
+                balloonMessage.Humidity = Math.Round(float.Parse(message.Substring(66,4)), 1);
+                balloonMessage.Pressure = Math.Round(float.Parse(message.Substring(70,5)), 1);
                 
                 // The Signal Strength appears at the end of the message
                 int position = message.IndexOf(":");
                 if ( position > 0)
                 {
-                    balloonMessage.FlightId = message.Substring(66, position - 66);
+                    balloonMessage.FlightId = message.Substring(75, position - 75);
                     balloonMessage.SignalStrength = Math.Round(float.Parse(message.Substring(position+1)), 1);
                 }
                 else 
                 {   
-                    balloonMessage.FlightId = message.Substring(66);
+                    balloonMessage.FlightId = message.Substring(75);
                 }
                 
             }
