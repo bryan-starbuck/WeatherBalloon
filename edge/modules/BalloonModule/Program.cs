@@ -56,9 +56,11 @@ namespace WeatherBalloon.BalloonModule
             }
             catch (Exception ex)
             {
-                Logger.LogFatalError("Failed to create module client: "+ex.Message);
+                Logger.LogFatalError("Failed to create module client.");
+                Logger.LogException(ex);
             
-                // todo - basically need to exit module
+                // Throw to make module shutdown and get restarted by the iot edge agent.
+                throw ex;
             }
 
             Logger.LogInfo("Created and connected Module Client. ");
@@ -78,19 +80,18 @@ namespace WeatherBalloon.BalloonModule
             {
                 try 
                 {
-
-                    byte[] messageBytes = message.GetBytes();
-                    string messageString = Encoding.UTF8.GetString(messageBytes);
-                    
-
-                    var telemetryMessage = JsonConvert.DeserializeObject<TelemetryMessage>(messageString);
+                    var telemetryMessage = MessageHelper.ParseMessage<TelemetryMessage>(message);
 
                     balloonModule.Receive(telemetryMessage);
                     Logger.LogInfo("Telemetry Message Processed.");
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning("Invalid Telemetry message ex: "+ ex.Message);
+                    byte[] messageBytes = message.GetBytes();
+                    string messageString = Encoding.UTF8.GetString(messageBytes);
+
+                    Logger.LogWarning("Invalid Telemetry message: "+messageString);
+                    Logger.LogException(ex);
                 }
             });
 

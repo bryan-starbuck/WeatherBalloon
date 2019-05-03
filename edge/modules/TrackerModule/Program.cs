@@ -86,7 +86,11 @@ namespace WeatherBalloon.TrackerModule
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+                    byte[] messageBytes = message.GetBytes();
+                    string messageString = Encoding.UTF8.GetString(messageBytes);
+
+                    Logger.LogWarning("Invalid GPS message: "+ messageString);
+                    Logger.LogException(ex);
                 }
             });
 
@@ -114,7 +118,11 @@ namespace WeatherBalloon.TrackerModule
             }
             catch (Exception ex)
             {
-                Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+                byte[] messageBytes = message.GetBytes();
+                string messageString = Encoding.UTF8.GetString(messageBytes);
+
+                Logger.LogWarning("Invalid balloon message: "+ messageString);
+                Logger.LogException(ex);
             }
             
             return MessageResponse.Completed;

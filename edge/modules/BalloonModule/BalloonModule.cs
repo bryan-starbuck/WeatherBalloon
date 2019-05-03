@@ -209,7 +209,8 @@ namespace WeatherBalloon.BalloonModule
             catch (Exception ex)
             {
                 // Todo - wire in with application insights
-                Logger.LogError($"Failed to transmit balloon message. Exception: {ex.Message}");
+                Logger.LogError($"Failed to transmit balloon message.");
+                Logger.LogException(ex);
                 return false;
             }
 

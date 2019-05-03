@@ -45,5 +45,12 @@ namespace WeatherBalloon.Common
         {
             Log(LoggingLevel.FatalError, message);
         }
+
+        public static void LogException(Exception ex)
+        {
+            Log(LoggingLevel.Error, "Exception: "+ ex.GetType());
+            Log(LoggingLevel.Error, ex.Message);
+            Log(LoggingLevel.Error, ex.StackTrace);
+        }
     }
 }

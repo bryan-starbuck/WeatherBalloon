@@ -118,8 +118,8 @@ namespace WeatherBalloon.SerialModule
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("Failed to process serial message: "+ ex.Message);
                     Logger.LogInfo("Bad serial message: "+receivedData);
+                    Logger.LogException(ex);
                 }
             }
         }
@@ -137,7 +137,8 @@ namespace WeatherBalloon.SerialModule
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Failed to transmit iot message. Exception: {ex.Message}");
+                Logger.LogError($"Failed to transmit iot balloon message.");
+                Logger.LogException(ex);
                 return false;
             }
 

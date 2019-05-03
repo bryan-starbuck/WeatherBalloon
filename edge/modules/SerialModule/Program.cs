@@ -95,8 +95,8 @@ namespace WeatherBalloon.SerialModule
             }
             catch (Exception ex)
             {
-                Console.WriteLine();
-                Console.WriteLine("Error when receiving desired property: {0}", ex.Message);
+                Logger.LogInfo("Error when receiving desired property");
+                Logger.LogException(ex);
             }
             return Task.CompletedTask;
         }
@@ -116,7 +116,11 @@ namespace WeatherBalloon.SerialModule
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogWarning("Invalid balloon message: "+ ex.Message);
+                    byte[] messageBytes = message.GetBytes();
+                    string messageString = Encoding.UTF8.GetString(messageBytes);
+
+                    Logger.LogWarning("Invalid balloon message: "+messageString);
+                    Logger.LogException(ex);
                 }
             });
 
