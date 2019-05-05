@@ -30,6 +30,7 @@ namespace WeatherBalloon.SerialModule
         private static SerialPort serialPort;
 
         private const int MaxMessageSize = 136;
+        private const int BaudRate = 115200;
 
         private WrappedModuleClient moduleClient;
 
@@ -57,6 +58,10 @@ namespace WeatherBalloon.SerialModule
                     Logger.LogInfo("Successfully opened /dev/ACM1");
                     serialPort = acm1;
                 }
+                else 
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -66,7 +71,7 @@ namespace WeatherBalloon.SerialModule
         {
             try 
             {
-                var newSerialPort = new SerialPort(port, 115200);
+                var newSerialPort = new SerialPort(port, BaudRate);
                 newSerialPort.RtsEnable = true;
 
                 newSerialPort.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
@@ -86,26 +91,38 @@ namespace WeatherBalloon.SerialModule
 
             if (compactMessage.Length > MaxMessageSize)
             {
-                Logger.LogWarning("Max message size exceeded: "+compactMessage);
+                Logger.LogWarning($"Max message size exceeded. {compactMessage.Length} {compactMessage}");
             }
 
-            lock (transmitLock)
+            if (!serialPort.IsOpen)
             {
-                serialPort.WriteLine(compactMessage);
+                // attempt to reopen the serial port if it has been closed.
+                Initialize().Wait();
+            }
+
+            if (serialPort.IsOpen)
+            {
+                lock (transmitLock)
+                {
+                    serialPort.WriteLine(compactMessage);
+                }
+            }
+            else 
+            {
+                Logger.LogError("Serial port is closed and could not be reopened.  Message not sent: " + compactMessage);
             }
         }
 
         private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
-            //string receivedData = sp.ReadExisting();
             string receivedData = sp.ReadLine();
 
             Logger.LogInfo("SerialData : "+receivedData);
 
             if (receivedData.StartsWith('-'))
             {
-                // ignore, debug messages.
+                // ignore, serial debug messages.
                 return;
             }
 

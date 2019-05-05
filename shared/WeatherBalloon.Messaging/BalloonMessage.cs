@@ -4,15 +4,21 @@ namespace WeatherBalloon.Messaging
 {
     public enum BalloonState { PreLaunch = 0, Rising = 1, Falling = 2, Landed = 3};
 
-    public class BalloonMessage : MessageBase
+    public class BalloonMessage : MessageBase, IDeviceMessage
     { 
         private static DateTime EpochTime = new DateTime(1970, 1, 1);
         
         public override string Type { get { return "balloon";}}
 
+        // Properties common with Tracker Message
+        public string DeviceName {get {return "Weather Balloon";}}
+
         public string FlightId {get;set;}
 
         public GPSLocation Location {get;set;}
+
+
+        // Balloon Specific properties
         public double AveAscent {get;set;}
         public double AveDescent {get;set;}
         public double BurstAltitude {get;set;}
@@ -34,7 +40,10 @@ namespace WeatherBalloon.Messaging
         public const double climb_offset = 10;
         public const double speed_offset = 50;
 
-       
+        public BalloonMessage()
+        {
+            Location = new GPSLocation();
+        }
 
         public string ToCompactMessage()
         {
@@ -57,7 +66,7 @@ namespace WeatherBalloon.Messaging
                 Temperature + BalloonMessage.temperature_offset,
                 Humidity,
                 Pressure,
-                FlightId);
+                FlightId.Substring(0,20));
 
         }
 
@@ -79,7 +88,6 @@ namespace WeatherBalloon.Messaging
                 balloonMessage.State = (BalloonState)Int16.Parse(message.Substring(18,1));
 
                 balloonMessage.BurstAltitude = float.Parse(message.Substring(19,6));
-                balloonMessage.Location =  new GPSLocation();
                 balloonMessage.Location.lat = Math.Round(float.Parse(message.Substring(25, 9)) - BalloonMessage.latitude_offset, 5);
                 balloonMessage.Location.@long = Math.Round(float.Parse(message.Substring(34, 9)) - BalloonMessage.longitude_offset, 5);
                 balloonMessage.Location.alt = float.Parse(message.Substring(43, 9));

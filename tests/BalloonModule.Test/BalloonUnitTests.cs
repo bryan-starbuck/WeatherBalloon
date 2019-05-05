@@ -15,24 +15,24 @@ namespace BalloonModule.Test
     public class BalloonUnitTests
     {
         [Fact]
-        public void ReceiveGPSMessageTest()
+        public void ReceiveTelemetryMessageTest()
         {
             // arrange
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
 
             var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
             
             // act 
-            balloonModule.Receive(gpsMessage);
+            balloonModule.Receive(telemetryMessage);
 
             // verify
-            balloonModule.Location.track.ShouldBe(gpsMessage.Location.track);
-            balloonModule.Location.@long.ShouldBe(gpsMessage.Location.@long);
-            balloonModule.Location.lat.ShouldBe(gpsMessage.Location.lat);
-            balloonModule.Location.mode.ShouldBe(gpsMessage.Location.mode);
-            balloonModule.Location.time.ShouldBe(gpsMessage.Location.time);
-            balloonModule.Location.speed.ShouldBe(gpsMessage.Location.speed);
-            balloonModule.Location.climb.ShouldBe(gpsMessage.Location.climb);
+            balloonModule.Location.track.ShouldBe(telemetryMessage.track);
+            balloonModule.Location.@long.ShouldBe(telemetryMessage.@long);
+            balloonModule.Location.lat.ShouldBe(telemetryMessage.lat);
+            balloonModule.Location.mode.ShouldBe(telemetryMessage.mode);
+            balloonModule.Location.time.ShouldBe(telemetryMessage.time);
+            balloonModule.Location.speed.ShouldBe(telemetryMessage.speed);
+            balloonModule.Location.climb.ShouldBe(telemetryMessage.climb);
         }
 
         [Theory]
@@ -44,17 +44,17 @@ namespace BalloonModule.Test
             // arrange
             var fakeModuleClient = new FakeModuleClient();
 
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
 
             // set gps to indicate rising balloon state
-            gpsMessage.Location.climb = climb;
-            gpsMessage.Location.alt = altitude;
+            telemetryMessage.climb = climb;
+            telemetryMessage.alt = altitude;
             
             var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
 
 
             // act
-            balloonModule.Receive(gpsMessage);
+            balloonModule.Receive(telemetryMessage);
             var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
@@ -72,23 +72,23 @@ namespace BalloonModule.Test
             var balloonMessage = MessageHelper.ParseMessage<BalloonMessage>(rawMessage);
 
             // balloon location
-            balloonMessage.Location.track.ShouldBe(gpsMessage.Location.track);
-            balloonMessage.Location.@long.ShouldBe(gpsMessage.Location.@long);
-            balloonMessage.Location.lat.ShouldBe(gpsMessage.Location.lat);
-            balloonMessage.Location.mode.ShouldBe(gpsMessage.Location.mode);
-            balloonMessage.Location.time.ShouldBe(gpsMessage.Location.time);
-            balloonMessage.Location.speed.ShouldBe(gpsMessage.Location.speed);
-            balloonMessage.Location.climb.ShouldBe(gpsMessage.Location.climb);
+            balloonMessage.Location.track.ShouldBe(telemetryMessage.track);
+            balloonMessage.Location.@long.ShouldBe(telemetryMessage.@long);
+            balloonMessage.Location.lat.ShouldBe(telemetryMessage.lat);
+            balloonMessage.Location.mode.ShouldBe(telemetryMessage.mode);
+            balloonMessage.Location.time.ShouldBe(telemetryMessage.time);
+            balloonMessage.Location.speed.ShouldBe(telemetryMessage.speed);
+            balloonMessage.Location.climb.ShouldBe(telemetryMessage.climb);
 
             if (expectedState == BalloonState.Rising)
             {
-                balloonMessage.AveAscent.ShouldBe(gpsMessage.Location.climb);
+                balloonMessage.AveAscent.ShouldBe(telemetryMessage.climb);
                 balloonMessage.AveDescent.ShouldBe(0.0);
             }
             else if (expectedState == BalloonState.Falling)
             {
                 balloonMessage.AveAscent.ShouldBe(0.0);
-                balloonMessage.AveDescent.ShouldBe(gpsMessage.Location.climb);
+                balloonMessage.AveDescent.ShouldBe(telemetryMessage.climb);
             }
 
             balloonMessage.State.ShouldBe(expectedState);
@@ -110,11 +110,11 @@ namespace BalloonModule.Test
             // arrange
             var fakeModuleClient = new FakeModuleClient();
 
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
 
             // set gps to indicate rising balloon state
-            gpsMessage.Location.climb = climb;
-            gpsMessage.Location.alt = altitude;
+            telemetryMessage.climb = climb;
+            telemetryMessage.alt = altitude;
             
             var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
 
@@ -123,7 +123,7 @@ namespace BalloonModule.Test
 
 
             // act
-            balloonModule.Receive(gpsMessage);
+            balloonModule.Receive(telemetryMessage);
             var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
@@ -140,23 +140,27 @@ namespace BalloonModule.Test
             var balloonMessage = MessageHelper.ParseMessage<BalloonMessage>(rawMessage);
 
             // balloon location
-            balloonMessage.Location.track.ShouldBe(gpsMessage.Location.track);
-            balloonMessage.Location.@long.ShouldBe(gpsMessage.Location.@long);
-            balloonMessage.Location.lat.ShouldBe(gpsMessage.Location.lat);
-            balloonMessage.Location.mode.ShouldBe(gpsMessage.Location.mode);
-            balloonMessage.Location.time.ShouldBe(gpsMessage.Location.time);
-            balloonMessage.Location.speed.ShouldBe(gpsMessage.Location.speed);
-            balloonMessage.Location.climb.ShouldBe(gpsMessage.Location.climb);
+            balloonMessage.Location.track.ShouldBe(telemetryMessage.track);
+            balloonMessage.Location.@long.ShouldBe(telemetryMessage.@long);
+            balloonMessage.Location.lat.ShouldBe(telemetryMessage.lat);
+            balloonMessage.Location.mode.ShouldBe(telemetryMessage.mode);
+            balloonMessage.Location.time.ShouldBe(telemetryMessage.time);
+            balloonMessage.Location.speed.ShouldBe(telemetryMessage.speed);
+            balloonMessage.Location.climb.ShouldBe(telemetryMessage.climb);
+            balloonMessage.Temperature.ShouldBe(telemetryMessage.temp);
+            balloonMessage.Pressure.ShouldBe(telemetryMessage.pressure);
+            balloonMessage.Humidity.ShouldBe(telemetryMessage.humidity);
+
 
             if (expectedState == BalloonState.Rising)
             {
-                balloonMessage.AveAscent.ShouldBe(gpsMessage.Location.climb);
+                balloonMessage.AveAscent.ShouldBe(telemetryMessage.climb);
                 balloonMessage.AveDescent.ShouldBe(0.0);
             }
             else if (expectedState == BalloonState.Falling)
             {
                 balloonMessage.AveAscent.ShouldBe(0.0);
-                balloonMessage.AveDescent.ShouldBe(gpsMessage.Location.climb);
+                balloonMessage.AveDescent.ShouldBe(telemetryMessage.climb);
             }
 
             balloonMessage.State.ShouldBe(expectedState);
@@ -183,18 +187,18 @@ namespace BalloonModule.Test
             // arrange
             var fakeModuleClient = new FakeModuleClient();
 
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
 
             // set gps to indicate rising balloon state
-            gpsMessage.Location.climb = climb;
-            gpsMessage.Location.alt = altitude;
+            telemetryMessage.climb = climb;
+            telemetryMessage.alt = altitude;
             
             var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
 
             balloonModule.BalloonState = initialState;
 
             // act
-            balloonModule.Receive(gpsMessage);
+            balloonModule.Receive(telemetryMessage);
             var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
@@ -224,17 +228,17 @@ namespace BalloonModule.Test
             // arrange
             var fakeModuleClient = new FakeModuleClient();
 
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
 
             // set gps to indicate rising balloon state
-            gpsMessage.Location.alt = altitude;
+            telemetryMessage.alt = altitude;
             
             var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
 
             balloonModule.BalloonState = initialState;
 
             // act
-            balloonModule.Receive(gpsMessage);
+            balloonModule.Receive(telemetryMessage);
             var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
@@ -257,12 +261,12 @@ namespace BalloonModule.Test
             var fakeModuleClient = A.Fake<IModuleClient>();
             A.CallTo(fakeModuleClient).Throws(new Exception("Fake exception generated for testing"));
 
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
             
             var balloonModule = new WeatherBalloon.BalloonModule.BalloonModule();
 
             // act 
-            balloonModule.Receive(gpsMessage);
+            balloonModule.Receive(telemetryMessage);
             var task = balloonModule.TransmitBalloonMessage(fakeModuleClient);
 
             // verify
@@ -270,21 +274,22 @@ namespace BalloonModule.Test
         }
     
 
-        private GPSMessage CreateGPSMessage()
+        private TelemetryMessage CreateTelemetryMessage()
         {
             Random random = new Random();
 
-            return new GPSMessage()
+            return new TelemetryMessage()
             {
-                Location = new GPSLocation() { 
-                    track = random.NextDouble(),
-                    @long = random.NextDouble(),
-                    lat = random.NextDouble(),
-                    mode = 0, 
-                    time = DateTime.UtcNow.ToString(),
-                    speed = random.NextDouble(), 
-                    climb = random.NextDouble()
-                }
+                track = random.NextDouble(),
+                @long = random.NextDouble(),
+                lat = random.NextDouble(),
+                mode = 0, 
+                time = DateTime.UtcNow.ToString(),
+                speed = random.NextDouble(), 
+                climb = random.NextDouble(),
+                temp = random.NextDouble(),
+                humidity = random.NextDouble(),
+                pressure = random.NextDouble()
             };
         }
     }

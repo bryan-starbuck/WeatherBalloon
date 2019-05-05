@@ -51,37 +51,41 @@ namespace TrackerModule.Test
             // verify
             task.Result.ShouldBe(true);
 
-            fakeModuleClient.SentMessages.Count.ShouldBe(1);
+            fakeModuleClient.SentMessages.Count.ShouldBe(2);
 
             // Sent on correct output?
             fakeModuleClient.SentMessages[0].Item1.ShouldBe(WeatherBalloon.TrackerModule.TrackerModule.TrackerOutputName);
             
             // Correct message?
-            var rawMessage = fakeModuleClient.SentMessages[0].Item2;
-            var trackerMessage = MessageHelper.ParseMessage<TrackerMessage>(rawMessage);
+            var rawMessage0 = fakeModuleClient.SentMessages[0].Item2;
+            var receivedBalloonMessage = MessageHelper.ParseMessage<BalloonMessage>(rawMessage0);
 
-            // tracker location
-            trackerMessage.TrackerLocation.track.ShouldBe(gpsMessage.Location.track);
-            trackerMessage.TrackerLocation.@long.ShouldBe(gpsMessage.Location.@long);
-            trackerMessage.TrackerLocation.lat.ShouldBe(gpsMessage.Location.lat);
-            trackerMessage.TrackerLocation.mode.ShouldBe(gpsMessage.Location.mode);
-            trackerMessage.TrackerLocation.time.ShouldBe(gpsMessage.Location.time);
-            trackerMessage.TrackerLocation.speed.ShouldBe(gpsMessage.Location.speed);
-            trackerMessage.TrackerLocation.climb.ShouldBe(gpsMessage.Location.climb);
+            var rawMessage1 = fakeModuleClient.SentMessages[1].Item2;
+            var receivedTrackerMessage = MessageHelper.ParseMessage<TrackerMessage>(rawMessage1);
 
             // balloon message fields
-            trackerMessage.BalloonLocation.track.ShouldBe(balloonMessage.Location.track);
-            trackerMessage.BalloonLocation.@long.ShouldBe(balloonMessage.Location.@long);
-            trackerMessage.BalloonLocation.lat.ShouldBe(balloonMessage.Location.lat);
-            trackerMessage.BalloonLocation.mode.ShouldBe(balloonMessage.Location.mode);
-            trackerMessage.BalloonLocation.time.ShouldBe(balloonMessage.Location.time);
-            trackerMessage.BalloonLocation.speed.ShouldBe(balloonMessage.Location.speed);
-            trackerMessage.BalloonLocation.climb.ShouldBe(balloonMessage.Location.climb);
+            receivedBalloonMessage.Location.track.ShouldBe(balloonMessage.Location.track);
+            receivedBalloonMessage.Location.@long.ShouldBe(balloonMessage.Location.@long);
+            receivedBalloonMessage.Location.lat.ShouldBe(balloonMessage.Location.lat);
+            receivedBalloonMessage.Location.mode.ShouldBe(balloonMessage.Location.mode);
+            receivedBalloonMessage.Location.time.ShouldBe(balloonMessage.Location.time);
+            receivedBalloonMessage.Location.speed.ShouldBe(balloonMessage.Location.speed);
+            receivedBalloonMessage.Location.climb.ShouldBe(balloonMessage.Location.climb);
+            receivedBalloonMessage.State.ShouldBe(balloonMessage.State);
+            receivedBalloonMessage.AveAscent.ShouldBe(balloonMessage.AveAscent);
+            receivedBalloonMessage.AveDescent.ShouldBe(balloonMessage.AveDescent);
+            receivedBalloonMessage.FlightId.ShouldBe(balloonMessage.FlightId);
+            receivedBalloonMessage.DeviceName.ShouldBe("Weather Balloon");
 
-            trackerMessage.State.ShouldBe(balloonMessage.State);
-            trackerMessage.AveAscent.ShouldBe(balloonMessage.AveAscent);
-            trackerMessage.AveDescent.ShouldBe(balloonMessage.AveDescent);
-
+            // tracker message fields
+            receivedTrackerMessage.Location.track.ShouldBe(gpsMessage.Location.track);
+            receivedTrackerMessage.Location.@long.ShouldBe(gpsMessage.Location.@long);
+            receivedTrackerMessage.Location.lat.ShouldBe(gpsMessage.Location.lat);
+            receivedTrackerMessage.Location.mode.ShouldBe(gpsMessage.Location.mode);
+            receivedTrackerMessage.Location.time.ShouldBe(gpsMessage.Location.time);
+            receivedTrackerMessage.Location.speed.ShouldBe(gpsMessage.Location.speed);
+            receivedTrackerMessage.Location.climb.ShouldBe(gpsMessage.Location.climb);
+            receivedTrackerMessage.FlightId.ShouldBe(balloonMessage.FlightId);
         }
 
         [Fact]
@@ -143,7 +147,8 @@ namespace TrackerModule.Test
                 State = BalloonState.PreLaunch,
                 AveAscent = 0.5,
                 AveDescent = -0.1,
-                BurstAltitude = 90000
+                BurstAltitude = 90000, 
+                FlightId = "Super Test!"
             };
         }
     }

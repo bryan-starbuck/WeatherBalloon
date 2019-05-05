@@ -66,32 +66,24 @@ namespace WeatherBalloon.TrackerModule
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task<bool> Receive (BalloonMessage message, IModuleClient moduleClient)
+        public async Task<bool> Receive (BalloonMessage balloonMessage, IModuleClient moduleClient)
         {
             Logger.LogInfo($"Recieved Balloon Message.");
 
-            // Map data to a new Tracker message
             var trackerMessage = new TrackerMessage()
             {
-                TrackerLocation = Location,
-                BalloonLocation = message.Location, 
-                State = message.State, 
-                AveAscent = message.AveAscent, 
-                AveDescent = message.AveDescent,
-                BurstAltitude = message.BurstAltitude,
+                Location = Location,
                 DeviceName = this.DeviceName,
-                FlightId = message.FlightId,
-                Humidity = message.Humidity,
-                Temperature = message.Temperature,
-                Pressure = message.Pressure,
-                SignalStrength = message.SignalStrength
+                FlightId = balloonMessage.FlightId,
             };
 
             try 
             {
-                Message iotMessage = new Message(trackerMessage.ToRawBytes());
+                Message balloonMessageRaw = new Message(balloonMessage.ToRawBytes());
+                await moduleClient.SendEventAsync(TrackerOutputName, balloonMessageRaw);
 
-                await moduleClient.SendEventAsync(TrackerOutputName, iotMessage);
+                Message trackerMessageRaw = new Message(trackerMessage.ToRawBytes());
+                await moduleClient.SendEventAsync(TrackerOutputName, trackerMessageRaw);
 
                 Logger.LogInfo($"transmitted message: {JsonConvert.SerializeObject(trackerMessage)}.");
             }

@@ -33,7 +33,7 @@ namespace WeatherBalloon.Cloud.Documents
 
         public double SignalStrength {get;set;}
 
-        public static BalloonDocument Create(TrackerMessage message)
+        public static BalloonDocument Create(BalloonMessage message)
         {
             return new BalloonDocument()
             {
@@ -41,18 +41,18 @@ namespace WeatherBalloon.Cloud.Documents
                 AveDescent = message.AveDescent,
                 BurstAltitude = message.BurstAltitude,
                 State = message.State,
-                Track = (message.BalloonLocation != null ) ? message.BalloonLocation.track : 0,
-                GpsMode = (message.BalloonLocation != null ) ? message.BalloonLocation.mode : 0,
-                GpsTime = (message.BalloonLocation != null ) ? message.BalloonLocation.time : "unknown",
-                Speed = (message.BalloonLocation != null ) ? message.BalloonLocation.speed : 0,
-                Climb = (message.BalloonLocation != null ) ? message.BalloonLocation.climb : 0,
+                Track = (message.Location != null ) ? message.Location.track : 0,
+                GpsMode = (message.Location != null ) ? message.Location.mode : 0,
+                GpsTime = (message.Location != null ) ? message.Location.time : "unknown",
+                Speed = (message.Location != null ) ? message.Location.speed : 0,
+                Climb = (message.Location != null ) ? message.Location.climb : 0,
                 FlightId = message.FlightId,
                 TimestampUTC = message.Timestamp,
                 partitionid = message.partitionid,
-                Latitude = (message.BalloonLocation != null ) ? message.BalloonLocation.lat : 0,
-                Longitude = (message.BalloonLocation != null ) ? message.BalloonLocation.@long : 0,
-                Altitude = (message.BalloonLocation != null ) ? message.BalloonLocation.alt : 0,
-                Geopoint = (message.BalloonLocation != null ) ? new Point(message.BalloonLocation.@long,message.BalloonLocation.lat) : null,
+                Latitude = (message.Location != null ) ? message.Location.lat : 0,
+                Longitude = (message.Location != null ) ? message.Location.@long : 0,
+                Altitude = (message.Location != null ) ? message.Location.alt : 0,
+                Geopoint = (message.Location != null ) ? new Point(message.Location.@long,message.Location.lat) : null,
                 TrackerSource = message.DeviceName,
                 Humidity = message.Humidity,
                 Pressure = message.Pressure,

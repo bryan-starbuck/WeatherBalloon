@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\shared\WeatherBalloon.Messaging\WeatherBalloon.Messaging.csproj" />
-    <ProjectReference Include="..\..\modules\BalloonModule\BalloonModule.csproj" />
+    <ProjectReference Include="..\..\edge\modules\BalloonModule\BalloonModule.csproj" />
   </ItemGroup>
 
 </Project>
