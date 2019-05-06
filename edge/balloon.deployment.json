@@ -5,7 +5,7 @@
               "modules": {
                   "WeatherBalloon": {
                       "settings": {
-                          "image": "starbucktest2.azurecr.io/balloonmodule:0.0.14-arm32v7",
+                          "image": "starbucktest2.azurecr.io/balloonmodule:$label",
                           "createOptions": ""
                       },
                       "type": "docker",
@@ -15,7 +15,7 @@
                   },
                   "IngestionModule": {
                       "settings": {
-                          "image": "starbucktest2.azurecr.io/ingestionmodule:0.0.14-arm32v7",
+                          "image": "starbucktest2.azurecr.io/ingestionmodule:$label",
                           "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"8080/tcp\":[{\"HostPort\":\"8080\"}]}}}"
                       },
                       "type": "docker",
@@ -25,7 +25,7 @@
                   },
                   "SerialModule": {
                       "settings": {
-                          "image": "starbucktest2.azurecr.io/serialmodule:0.0.17-arm32v7",
+                          "image": "starbucktest2.azurecr.io/serialmodule:$label",
                           "createOptions": "{\"HostConfig\":{\"Privileged\":true}}"
                       },
                       "type": "docker",
@@ -35,7 +35,7 @@
                   },
                   "StorageModule": {
                       "settings": {
-                          "image": "starbucktest2.azurecr.io/storagemodule:0.0.4-arm32v7",
+                          "image": "starbucktest2.azurecr.io/storagemodule:$label",
                           "createOptions": "{\"HostConfig\":{\"Binds\":[\"/balloon_data:/balloon_data\"]},\"Mounts\":[{\"Name\":\"balloon_data\",\"Type\":\"bind\",\"Source\":\"/balloon_data\",\"Destination\":\"/balloon_data\",\"Mode\":\"\",\"RW\":true}]}"
                       },
                       "type": "docker",
@@ -50,7 +50,7 @@
                       "registryCredentials": {
                           "starbucktest2": {
                               "address": "starbucktest2.azurecr.io",
-                              "password": "Axr7u1Xu8Tq9lQgtFKN0tVgy+/UyJzrd",
+                              "password": "$password",
                               "username": "starbucktest2"
                           }
                       }

@@ -44,8 +44,13 @@ namespace SerialModule.Test
             serializedBalloonMessage.AveDescent.ShouldBe(balloonMessage.AveDescent);
             serializedBalloonMessage.FlightId.ShouldBe(balloonMessage.FlightId);
             serializedBalloonMessage.BurstAltitude.ShouldBe(balloonMessage.BurstAltitude);
-            serializedBalloonMessage.Location.lat.ShouldBe(Math.Round(balloonMessage.Location.lat, 5));
-            serializedBalloonMessage.Location.@long.ShouldBe(Math.Round(balloonMessage.Location.@long, 5));
+
+            var diffLat = Math.Abs(serializedBalloonMessage.Location.lat - Math.Round(balloonMessage.Location.lat, 5));
+            diffLat.ShouldBeLessThan(0.0001);
+
+            var diffLong = Math.Abs(serializedBalloonMessage.Location.@long - Math.Round(balloonMessage.Location.@long, 5));
+            diffLong.ShouldBeLessThan(0.0001);
+
             serializedBalloonMessage.Location.alt.ShouldBe(balloonMessage.Location.alt);
             serializedBalloonMessage.Temperature.ShouldBe(balloonMessage.Temperature);
             serializedBalloonMessage.Pressure.ShouldBe(balloonMessage.Pressure);
@@ -102,8 +107,8 @@ namespace SerialModule.Test
             {
                 Location = new GPSLocation() { 
                     track = random.NextDouble(),
-                    @long = random.NextDouble(),
-                    lat = random.NextDouble(),
+                    @long = Math.Round(random.NextDouble(), 5),
+                    lat = Math.Round(random.NextDouble(), 5),
                     mode = 0, 
                     time = DateTime.UtcNow.ToString(),
                     speed = random.NextDouble(), 

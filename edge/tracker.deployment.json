@@ -1,88 +1,115 @@
 {
   "modulesContent": {
-    "$edgeAgent": {
-      "properties.desired": {
-        "schemaVersion": "1.0",
-        "runtime": {
-          "type": "docker",
-          "settings": {
-            "minDockerVersion": "v1.25",
-            "loggingOptions": "",
-            "registryCredentials": {
-              "starbuck": {
-                "username": "$CONTAINER_REGISTRY_USERNAME_starbuck",
-                "password": "$CONTAINER_REGISTRY_PASSWORD_starbuck",
-                "address": "starbuck.azurecr.io"
+      "$edgeAgent": {
+          "properties.desired": {
+              "modules": {
+                  "IngestionModule": {
+                      "settings": {
+                          "image": "starbucktest2.azurecr.io/ingestionmodule:$label",
+                          "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"8080/tcp\":[{\"HostPort\":\"8080\"}]}}}"
+                      },
+                      "type": "docker",
+                      "version": "1.0",
+                      "status": "running",
+                      "restartPolicy": "always"
+                  },
+                  "SerialModule": {
+                      "settings": {
+                          "image": "starbucktest2.azurecr.io/serialmodule:$label",
+                          "createOptions": "{\"HostConfig\":{\"Privileged\":true}}"
+                      },
+                      "type": "docker",
+                      "version": "1.0",
+                      "status": "running",
+                      "restartPolicy": "always"
+                  },
+                  "TrackerModule": {
+                      "settings": {
+                          "image": "starbucktest2.azurecr.io/trackermodule:$label",
+                          "createOptions": ""
+                      },
+                      "type": "docker",
+                      "version": "1.0",
+                      "status": "running",
+                      "restartPolicy": "always"
+                  },
+                  "StorageModule": {
+                      "settings": {
+                          "image": "starbucktest2.azurecr.io/storagemodule:$label",
+                          "createOptions": "{\"HostConfig\":{\"Binds\":[\"/balloon_data:/balloon_data\"]},\"Mounts\":[{\"Name\":\"balloon_data\",\"Type\":\"bind\",\"Source\":\"/balloon_data\",\"Destination\":\"/balloon_data\",\"Mode\":\"\",\"RW\":true}]}"
+                      },
+                      "type": "docker",
+                      "version": "1.0",
+                      "status": "running",
+                      "restartPolicy": "always"
+                  }
               },
-              "weatherballoon": {
-                "username": "$CONTAINER_REGISTRY_USERNAME_weatherballoon",
-                "password": "$CONTAINER_REGISTRY_PASSWORD_weatherballoon",
-                "address": "weatherballoon.azurecr.io"
+              "runtime": {
+                  "settings": {
+                      "minDockerVersion": "v1.25",
+                      "registryCredentials": {
+                          "starbucktest2": {
+                              "address": "starbucktest2.azurecr.io",
+                              "password": "$password",
+                              "username": "starbucktest2"
+                          }
+                      }
+                  },
+                  "type": "docker"
+              },
+              "schemaVersion": "1.0",
+              "systemModules": {
+                  "edgeAgent": {
+                      "settings": {
+                          "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+                          "createOptions": ""
+                      },
+                      "type": "docker"
+                  },
+                  "edgeHub": {
+                      "settings": {
+                          "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+                          "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"443/tcp\":[{\"HostPort\":\"443\"}],\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}]}}}"
+                      },
+                      "type": "docker",
+                      "env": {
+                          "OptimizeForPerformance": {
+                              "value": "false"
+                          }
+                      },
+                      "status": "running",
+                      "restartPolicy": "always"
+                  }
               }
-            }
           }
-        },
-        "systemModules": {
-          "edgeAgent": {
-            "type": "docker",
-            "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
-              "createOptions": ""
-            }
-          },
-          "edgeHub": {
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
-              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}], \"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}"
-            }
+      },
+      "$edgeHub": {
+          "properties.desired": {
+              "routes": {
+                  "ingestion": "FROM /messages/modules/IngestionModule/outputs/output1 INTO BrokeredEndpoint(\"/modules/TrackerModule/inputs/telemetryInput\")",
+                  "serial": "FROM /messages/modules/SerialModule/outputs/serialOutput INTO BrokeredEndpoint(\"/modules/TrackerModule/inputs/balloonInput\")",
+                  "storage": "FROM /messages/modules/SerialModule/outputs/serialOutput INTO BrokeredEndpoint(\"/modules/StorageModule/inputs/StorageInput\")",
+                  "toUpstream": "FROM /messages/modules/TrackerModule/outputs/trackerOutput INTO $upstream"
+              },
+              "schemaVersion": "1.0",
+              "storeAndForwardConfiguration": {
+                  "timeToLiveSecs": 7200
+              }
           }
-        },
-        "modules": {
-          "TrackerModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.TrackerModule.arm32v7}",
-              "createOptions": ""
-            }
-          },
-          "IngestionModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.IngestionModule.arm32v7}",
-              "createOptions": ""
-            }
-          },
-          "LoraModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.LoraModule.arm32v7}",
-              "createOptions": ""
-            }
+      },
+      "IngestionModule": {
+          "properties.desired": {}
+      },
+      "SerialModule": {
+          "properties.desired": {}
+      },
+      "TrackerModule": {
+          "properties.desired": {
+              "DeviceName": "TrackerOne"
           }
+      },
+      "StorageModule": {
+          "properties.desired": {}
       }
-    },
-    "$edgeHub": {
-      "properties.desired": {
-        "schemaVersion": "1.0",
-        "routes": {
-          "DataIngestionModuleToIoTHub": "FROM /messages/modules/IngestionModule/outputs/* INTO $upstream"
-          },
-        "storeAndForwardConfiguration": {
-          "timeToLiveSecs": 7200
-        }
-      }
-    }
   }
 }
