@@ -66,7 +66,7 @@ namespace WeatherBalloon.Messaging
                 Temperature + BalloonMessage.temperature_offset,
                 Humidity,
                 Pressure,
-                FlightId.Substring(0,20));
+                FlightId);
 
         }
 

@@ -64,11 +64,11 @@ namespace WeatherBalloon.SerialModule
             // Attach a callback for updates to the module twin's desired properties.
             //await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertiesUpdate, null);
 
-            serialModule = new SerialModule();
-            await serialModule.Initialize();
-
             // Register callback to be called when a message is received by the module
             await ioTHubModuleClient.SetInputMessageHandlerAsync(SerialModule.BalloonInputName, ProcessBalloonMessage, ioTHubModuleClient);
+
+            serialModule = new SerialModule();
+            await serialModule.Initialize();
         }
 
         private static Task OnDesiredPropertiesUpdate(TwinCollection desiredProperties, object userContext)
@@ -106,8 +106,10 @@ namespace WeatherBalloon.SerialModule
         /// </summary>
         static async Task<MessageResponse> ProcessBalloonMessage(Message message, object userContext)
         {
-            await Task.Run( () => 
-            {
+            Logger.LogInfo("Start ProcessBalloonMessage.");
+
+            //await Task.Run( () => 
+            //{
                 try 
                 {
                     var balloonMessage = MessageHelper.ParseMessage<BalloonMessage>(message);
@@ -116,13 +118,16 @@ namespace WeatherBalloon.SerialModule
                 }
                 catch (Exception ex)
                 {
-                    byte[] messageBytes = message.GetBytes();
-                    string messageString = Encoding.UTF8.GetString(messageBytes);
+                    //byte[] messageBytes = message.GetBytes();
+                    //string messageString = Encoding.UTF8.GetString(messageBytes);
 
-                    Logger.LogWarning("Invalid balloon message: "+messageString);
+                    //Logger.LogWarning("Invalid balloon message: "+messageString);
                     Logger.LogException(ex);
                 }
-            });
+            //});
+
+
+            Logger.LogInfo("Complete ProcessBalloonMessage.");
 
             return MessageResponse.Completed;
         }
