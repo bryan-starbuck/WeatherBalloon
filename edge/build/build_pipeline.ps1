@@ -4,6 +4,7 @@
 ##   ./build_pipeline.ps1 -version #.#.# -target [arm32v7 (default) | amd64]
 ##
 ## performs Build, Test, Dockerization, Docker Publish, Device update
+## todo: Azure resources need to be parameterized throughout all scripts.
 ###############################################################################
 param(
   [string]$version = '0.0.18',
@@ -12,7 +13,7 @@ param(
 
 Write-Host "Building all edge modules"
 
-./version -label ($version + '-' + $target)
+./version.ps1 -label ($version + '-' + $target)
 
 ./build.ps1
 if ($LASTEXITCODE) { throw "Build/Test failed" }

@@ -80,16 +80,18 @@ namespace WeatherBalloon.TrackerModule
             {
                 try 
                 {
-                    var gpsMessage = MessageHelper.ParseMessage<GPSMessage>(message);
-                    trackerModule.Receive(gpsMessage);
-                    Logger.LogInfo("GPS Message Processed.");
+                    Logger.LogInfo("Telemetry Message Received.");
+
+                    var telemetryMessage = MessageHelper.ParseMessage<TelemetryMessage>(message);
+                    trackerModule.Receive(telemetryMessage);
+                    Logger.LogInfo("Telemetry Message Processed.");
                 }
                 catch (Exception ex)
                 {
                     byte[] messageBytes = message.GetBytes();
                     string messageString = Encoding.UTF8.GetString(messageBytes);
 
-                    Logger.LogWarning("Invalid GPS message: "+ messageString);
+                    Logger.LogWarning("Invalid Telemetry message: "+ messageString);
                     Logger.LogException(ex);
                 }
             });

@@ -49,13 +49,23 @@ namespace WeatherBalloon.TrackerModule
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public bool Receive (GPSMessage message)
+        public bool Receive (TelemetryMessage message)
         {
             lock (lockingUpdateObject)
             {
-                Location = message.Location;
+                Location = new GPSLocation()
+                {
+                    track = message.track,
+                    type = message.type,
+                    @long = message.@long,
+                    lat = message.lat,
+                    time = message.time,
+                    alt = message.alt, 
+                    speed = message.speed,
+                    climb = message.climb  
+                };
 
-                Logger.LogInfo($"Recieved GPS Location.");
+                Logger.LogInfo($"Recieved Telemetry Location.");
             }
 
             return true;

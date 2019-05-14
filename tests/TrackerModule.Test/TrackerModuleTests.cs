@@ -13,24 +13,24 @@ namespace TrackerModule.Test
     public class TrackerModuleTests
     {
         [Fact]
-        public void ReceiveGPSMessageTest()
+        public void ReceiveTelemetryMessageTest()
         {
             // arrange
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
 
             var trackerModule = new WeatherBalloon.TrackerModule.TrackerModule();
             
             // act 
-            trackerModule.Receive(gpsMessage);
+            trackerModule.Receive(telemetryMessage);
 
             // verify
-            trackerModule.Location.track.ShouldBe(gpsMessage.Location.track);
-            trackerModule.Location.@long.ShouldBe(gpsMessage.Location.@long);
-            trackerModule.Location.lat.ShouldBe(gpsMessage.Location.lat);
-            trackerModule.Location.mode.ShouldBe(gpsMessage.Location.mode);
-            trackerModule.Location.time.ShouldBe(gpsMessage.Location.time);
-            trackerModule.Location.speed.ShouldBe(gpsMessage.Location.speed);
-            trackerModule.Location.climb.ShouldBe(gpsMessage.Location.climb);
+            trackerModule.Location.track.ShouldBe(telemetryMessage.track);
+            trackerModule.Location.@long.ShouldBe(telemetryMessage.@long);
+            trackerModule.Location.lat.ShouldBe(telemetryMessage.lat);
+            trackerModule.Location.mode.ShouldBe(telemetryMessage.mode);
+            trackerModule.Location.time.ShouldBe(telemetryMessage.time);
+            trackerModule.Location.speed.ShouldBe(telemetryMessage.speed);
+            trackerModule.Location.climb.ShouldBe(telemetryMessage.climb);
         }
 
         [Fact]
@@ -39,13 +39,13 @@ namespace TrackerModule.Test
             // arrange
             var fakeModuleClient = new FakeModuleClient();
 
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
             var balloonMessage = CreateBalloonMessage();
 
             var trackerModule = new WeatherBalloon.TrackerModule.TrackerModule();
 
             // act 
-            trackerModule.Receive(gpsMessage);
+            trackerModule.Receive(telemetryMessage);
             var task = trackerModule.Receive(balloonMessage, fakeModuleClient);
 
             // verify
@@ -78,13 +78,13 @@ namespace TrackerModule.Test
             receivedBalloonMessage.DeviceName.ShouldBe("Weather Balloon");
 
             // tracker message fields
-            receivedTrackerMessage.Location.track.ShouldBe(gpsMessage.Location.track);
-            receivedTrackerMessage.Location.@long.ShouldBe(gpsMessage.Location.@long);
-            receivedTrackerMessage.Location.lat.ShouldBe(gpsMessage.Location.lat);
-            receivedTrackerMessage.Location.mode.ShouldBe(gpsMessage.Location.mode);
-            receivedTrackerMessage.Location.time.ShouldBe(gpsMessage.Location.time);
-            receivedTrackerMessage.Location.speed.ShouldBe(gpsMessage.Location.speed);
-            receivedTrackerMessage.Location.climb.ShouldBe(gpsMessage.Location.climb);
+            receivedTrackerMessage.Location.track.ShouldBe(telemetryMessage.track);
+            receivedTrackerMessage.Location.@long.ShouldBe(telemetryMessage.@long);
+            receivedTrackerMessage.Location.lat.ShouldBe(telemetryMessage.lat);
+            receivedTrackerMessage.Location.mode.ShouldBe(telemetryMessage.mode);
+            receivedTrackerMessage.Location.time.ShouldBe(telemetryMessage.time);
+            receivedTrackerMessage.Location.speed.ShouldBe(telemetryMessage.speed);
+            receivedTrackerMessage.Location.climb.ShouldBe(telemetryMessage.climb);
             receivedTrackerMessage.FlightId.ShouldBe(balloonMessage.FlightId);
         }
 
@@ -95,13 +95,13 @@ namespace TrackerModule.Test
             var fakeModuleClient = A.Fake<IModuleClient>();
             A.CallTo(fakeModuleClient).Throws(new Exception("Fake exception generated for testing"));
 
-            var gpsMessage = CreateGPSMessage();
+            var telemetryMessage = CreateTelemetryMessage();
             var balloonMessage = CreateBalloonMessage();
 
             var trackerModule = new WeatherBalloon.TrackerModule.TrackerModule();
 
             // act 
-            trackerModule.Receive(gpsMessage);
+            trackerModule.Receive(telemetryMessage);
             var task = trackerModule.Receive(balloonMessage, fakeModuleClient);
 
             // verify
@@ -110,21 +110,19 @@ namespace TrackerModule.Test
 
 
 
-        private GPSMessage CreateGPSMessage()
+        private TelemetryMessage CreateTelemetryMessage()
         {
             Random random = new Random();
 
-            return new GPSMessage()
+            return new TelemetryMessage()
             {
-                Location = new GPSLocation() { 
-                    track = random.NextDouble(),
-                    @long = random.NextDouble(),
-                    lat = random.NextDouble(),
-                    mode = 0, 
-                    time = DateTime.UtcNow.ToString(),
-                    speed = random.NextDouble(), 
-                    climb = random.NextDouble()
-                }
+                track = random.NextDouble(),
+                @long = random.NextDouble(),
+                lat = random.NextDouble(),
+                mode = 0, 
+                time = DateTime.UtcNow.ToString(),
+                speed = random.NextDouble(), 
+                climb = random.NextDouble()
             };
         }
 

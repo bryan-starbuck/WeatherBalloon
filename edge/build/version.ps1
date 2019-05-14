@@ -1,3 +1,10 @@
+##################################################
+# Create deployment template files with version
+#
+# todo: need to parameterize the container registry 
+# in the deployment templates
+###################################################
+
 param(
   [string]$label = '0.0.15-arm32v7'
 )

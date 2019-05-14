@@ -1,3 +1,10 @@
+##################################################
+# Build dotnet iot edge modules
+#
+# todo: parameterize
+###################################################
+
+
 param(
   [string]$path = $PSScriptRoot,
   [string[]]$targets = 'default'
@@ -9,7 +16,7 @@ function Invoke-Dotnet {
   if ($LASTEXITCODE) { throw "Dotnet failed" }
 }
 
-# Boostrap posh-build
+# Bootstrap posh-build
 $build_dir = Join-Path $path "."
 if (! (Test-Path (Join-Path $build_dir "Posh-Build.ps1"))) { Write-Host "Installing posh-build..."; New-Item -Type Directory $build_dir -ErrorAction Ignore | Out-Null; Save-Script "Posh-Build" -Path $build_dir }
 . (Join-Path $build_dir "Posh-Build.ps1")
