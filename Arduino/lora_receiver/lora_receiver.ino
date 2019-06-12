@@ -105,14 +105,22 @@ void setup()
     Serial.println("-setFrequency failed");
     while (1);
   }
-  Serial.print("-Set Freq to: "); Serial.println(RF95_FREQ);
+  Serial.print("-Set Freq to: "); 
+  Serial.println(RF95_FREQ);
+
+  rf95.setSignalBandwidth(62500);
+  rf95.setCodingRate4(1);
+  rf95.setSpreadingFactor(10);
+  
+  //rf95.setModemConfig(RH_RF95::Bw125Cr48Sf4096);  //set for pre-configured long range
+  rf95.setTxPower(20);  //set for 100mw
  
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
  
   // The default transmitter power is 13dBm, using PA_BOOST.
   // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then
   // you can set transmitter powers from 5 to 23 dBm:
-  rf95.setTxPower(26, false);
+  //rf95.setTxPower(26, false);
   //rf95.setModemConfig(RH_RF95::ModemConfigChoice::Bw31_25Cr48Sf512);
 }
  

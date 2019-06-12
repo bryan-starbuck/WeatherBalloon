@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 using WeatherBalloon.Messaging;
 using WeatherBalloon.Common;
+using System.Collections.Generic;
 
 namespace WeatherBalloon.TrackerModule
 {
@@ -34,14 +35,23 @@ namespace WeatherBalloon.TrackerModule
         /// <summary>
         /// Current Location of the tracker
         /// </summary>
-        public GPSLocation Location;
+        public GPSLocation Location = new GPSLocation();
 
         private object lockingUpdateObject = new object();
+
+        // history of the last five minutes of balloon message receipts
+        private Queue<bool> packetReceiveHistory = new Queue<bool>();
         
+        private Timer packetReceiptTimer;
+        private const int packetReceiptInterval = 70000;
+
+        private string FlightId;
         
         public TrackerModule ()
         {
             DeviceName = "Unknown Tracker";
+
+            packetReceiptTimer = new Timer(ReceiptTimerCallback, null,  packetReceiptInterval, packetReceiptInterval);
         }
 
         /// <summary>
@@ -53,19 +63,16 @@ namespace WeatherBalloon.TrackerModule
         {
             lock (lockingUpdateObject)
             {
-                Location = new GPSLocation()
-                {
-                    track = message.track,
-                    type = message.type,
-                    @long = message.@long,
-                    lat = message.lat,
-                    time = message.time,
-                    alt = message.alt, 
-                    speed = message.speed,
-                    climb = message.climb  
-                };
+                Location.track = message.track;
+                Location.type = message.type;
+                Location.@long = message.@long;
+                Location.lat = message.lat;
+                Location.time = message.time;
+                Location.alt = message.alt;
+                Location.speed = message.speed;
+                Location.climb = message.climb;
 
-                Logger.LogInfo($"Recieved Telemetry Location.");
+                Logger.LogInfo($"Received Telemetry Location. {Location.@long},{Location.lat}");
             }
 
             return true;
@@ -78,13 +85,18 @@ namespace WeatherBalloon.TrackerModule
         /// <returns></returns>
         public async Task<bool> Receive (BalloonMessage balloonMessage, IModuleClient moduleClient)
         {
-            Logger.LogInfo($"Recieved Balloon Message.");
+            Logger.LogInfo($"Received Balloon Message.");
+            UpdatePacketReceiveHistory(true);
+            packetReceiptTimer.Change(packetReceiptInterval,packetReceiptInterval);
+
+            this.FlightId = balloonMessage.FlightId; 
 
             var trackerMessage = new TrackerMessage()
             {
-                Location = Location,
+                Location = this.Location,
                 DeviceName = this.DeviceName,
                 FlightId = balloonMessage.FlightId,
+                PacketReceivedPercentage = CalculatePacketReceivedPercentage()
             };
 
             try 
@@ -106,6 +118,61 @@ namespace WeatherBalloon.TrackerModule
 
             return true;
         }
+        
+        private void UpdatePacketReceiveHistory(bool newValue)
+        {
+            packetReceiveHistory.Enqueue(newValue);
+            if (packetReceiveHistory.Count > 5)
+            {
+                packetReceiveHistory.Dequeue();
+            }
+        }
 
+        private double CalculatePacketReceivedPercentage()
+        {
+            if (packetReceiveHistory.Count == 0)
+            {
+                Logger.LogInfo("packetReceiveHistory is empty.");
+                return 0;
+            }
+
+            var receivedCount = 0;
+
+            foreach( var flag in packetReceiveHistory)
+            {
+                if (flag)
+                {
+                    receivedCount++;
+                }
+            }
+
+            return (double)receivedCount/(double)packetReceiveHistory.Count;
+        }
+
+        private void ReceiptTimerCallback(object state)
+        {
+            Logger.LogWarning("Timer fired - did not receive expected balloon message");
+            UpdatePacketReceiveHistory(false);
+
+            var trackerMessage = new TrackerMessage()
+            {
+                Location = this.Location,
+                DeviceName = this.DeviceName,
+                FlightId = this.FlightId,
+                PacketReceivedPercentage = CalculatePacketReceivedPercentage()
+            };
+
+            try 
+            {
+                var moduleClient = WrappedModuleClient.Create().Result;
+                Message trackerMessageRaw = new Message(trackerMessage.ToRawBytes());
+                moduleClient.SendEventAsync(TrackerOutputName, trackerMessageRaw).Wait();
+            }
+            catch (Exception ex)
+            {
+                // Todo - wire in with application insights
+                Logger.LogWarning($"Error Transmitter tracker message: {ex.Message}");
+            }
+        }
     }
 }

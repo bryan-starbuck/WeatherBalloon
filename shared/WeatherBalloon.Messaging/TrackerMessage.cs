@@ -12,6 +12,9 @@ namespace WeatherBalloon.Messaging
         public string DeviceName { get;set; }
 
         public GPSLocation Location {get;set;}
+
+        // percentage of balloon messages received/expected over the last five minutes
+        public double PacketReceivedPercentage {get;set;}
     }
 
 

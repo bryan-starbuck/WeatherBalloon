@@ -68,7 +68,20 @@ namespace WeatherBalloon.Cloud
 
             if (balloonDocument.State == BalloonState.PreLaunch || balloonDocument.State == BalloonState.Landed)
             {
-                log.LogInformation($"Balloon not in the air, no prediction calculated");
+                log.LogInformation($"Balloon not in the air, fake prediction calculated");
+
+                // TEST CODE
+
+                var fakePrediction = new PredictionDocument() { 
+                    FlightId = balloonDocument.FlightId,
+                    TrackerSource = balloonDocument.TrackerSource,
+                    Geopoint = new Point(balloonDocument.Longitude, balloonDocument.Latitude),
+                    partitionid = balloonDocument.partitionid
+                };
+
+                var predictionNotification = new PredictionNotification(new PredictionDocument());
+
+                SendPredictionNotification(predictionNotification);
                 return;
             }
 

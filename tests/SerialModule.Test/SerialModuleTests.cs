@@ -18,7 +18,7 @@ namespace SerialModule.Test
             this.output = output;
         }
 
-        [Fact]
+        [Fact(DisplayName = "DisplayName should be displayed")]
         public void CompactSerializationTest()
         {
             // arrange
@@ -51,7 +51,7 @@ namespace SerialModule.Test
             var diffLong = Math.Abs(serializedBalloonMessage.Location.@long - Math.Round(balloonMessage.Location.@long, 5));
             diffLong.ShouldBeLessThan(0.0001);
 
-            serializedBalloonMessage.Location.alt.ShouldBe(balloonMessage.Location.alt);
+            serializedBalloonMessage.Location.alt.ShouldBe(Math.Round(balloonMessage.Location.alt, 2));
             serializedBalloonMessage.Temperature.ShouldBe(balloonMessage.Temperature);
             serializedBalloonMessage.Pressure.ShouldBe(balloonMessage.Pressure);
             serializedBalloonMessage.Humidity.ShouldBe(balloonMessage.Humidity);
@@ -112,7 +112,8 @@ namespace SerialModule.Test
                     mode = 0, 
                     time = DateTime.UtcNow.ToString(),
                     speed = random.NextDouble(), 
-                    climb = random.NextDouble()
+                    climb = random.NextDouble(),
+                    alt = 101010.55
                 },
                 State = BalloonState.PreLaunch,
                 AveAscent = 0.5,

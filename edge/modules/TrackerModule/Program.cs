@@ -19,6 +19,7 @@ namespace WeatherBalloon.TrackerModule
     class Program
     {
         private static TrackerModule trackerModule = new TrackerModule();
+        private static WrappedModuleClient wrappedModuleClient;
 
         static void Main(string[] args)
         {
@@ -54,7 +55,10 @@ namespace WeatherBalloon.TrackerModule
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
             await ioTHubModuleClient.OpenAsync();
-            Console.WriteLine("IoT Hub module client initialized.");
+            wrappedModuleClient = new WrappedModuleClient(ioTHubModuleClient);
+
+            Logger.LogInfo("IoT Hub module client initialized.");
+
 
             // get module twin settings
             var moduleTwin = await ioTHubModuleClient.GetTwinAsync();
@@ -84,14 +88,12 @@ namespace WeatherBalloon.TrackerModule
 
                     var telemetryMessage = MessageHelper.ParseMessage<TelemetryMessage>(message);
                     trackerModule.Receive(telemetryMessage);
-                    Logger.LogInfo("Telemetry Message Processed.");
+                    Logger.LogInfo($"Telemetry Message Processed. {telemetryMessage.@long},{telemetryMessage.lat}");
+
+                    
                 }
                 catch (Exception ex)
                 {
-                    byte[] messageBytes = message.GetBytes();
-                    string messageString = Encoding.UTF8.GetString(messageBytes);
-
-                    Logger.LogWarning("Invalid Telemetry message: "+ messageString);
                     Logger.LogException(ex);
                 }
             });
@@ -104,13 +106,18 @@ namespace WeatherBalloon.TrackerModule
         /// </summary>
         static async Task<MessageResponse> ProcessBalloonData(Message message, object userContext)
         {
-            ModuleClient moduleClient = userContext as ModuleClient;
-            if (moduleClient == null)
-            {
-                throw new ArgumentException("Invalid user context in ProcessBalloonData");
-            }
+            //ModuleClient moduleClient = userContext as ModuleClient;
+            //if (moduleClient == null)
+            //{
+            //    throw new ArgumentException("Invalid user context in ProcessBalloonData");
+            //}
 
-            WrappedModuleClient wrappedModuleClient = new WrappedModuleClient(moduleClient);    
+            //WrappedModuleClient wrappedModuleClient = new WrappedModuleClient(moduleClient);    
+
+            if (wrappedModuleClient == null)
+            {
+                throw new Exception("module client not initialized in ProcessBalloonData.");
+            }
 
             try 
             {
