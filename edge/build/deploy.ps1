@@ -10,3 +10,4 @@ az iot edge set-modules --device-id TrackerOne --hub-name StarbuckTest --content
 
 az iot edge set-modules --device-id TrackerTwo-test --hub-name StarbuckTest --content ../tracker_build.deployment.json
 
+az iot edge set-modules --device-id TrackerThree --hub-name StarbuckTest --content ../tracker_build.deployment.json

@@ -49,7 +49,7 @@ namespace WeatherBalloon.Cloud
 
                 var predictionNotification = JsonConvert.DeserializeObject<PredictionNotification>(fixedBody);
 
-                var message = new CreateMessageOptions(toPhoneNumber)
+                var message = new CreateMessageOptions(predictionNotification.ToPhoneNumber)
                 {
                     Body = SMSHelper.FormatSMS(predictionNotification),
                     From = fromPhoneNumber,

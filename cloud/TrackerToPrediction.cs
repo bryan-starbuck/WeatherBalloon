@@ -31,6 +31,8 @@ namespace WeatherBalloon.Cloud
         private static string cosmosDB = Environment.GetEnvironmentVariable("CosmosDB");
         private static string cosmosDoc = Environment.GetEnvironmentVariable("CosmosDoc");
 
+        private static string SMSRecipients = Environment.GetEnvironmentVariable("SMSRecipients");
+
         private static string SMSNotificationFunctionKey = Environment.GetEnvironmentVariable("SMSNotificationFunctionKey");
         
         static HttpClient client = new HttpClient();
@@ -66,9 +68,15 @@ namespace WeatherBalloon.Cloud
 
             log.LogInformation($"Balloon state: {balloonDocument.State}");
 
-            if (balloonDocument.State == BalloonState.PreLaunch || balloonDocument.State == BalloonState.Landed)
+            if (balloonDocument.TimestampUTC.AddMinutes(5) < DateTime.UtcNow)
             {
-                log.LogInformation($"Balloon not in the air, fake prediction calculated");
+                log.LogInformation("No new information. Recent balloon time: "+balloonDocument.TimestampUTC.AddHours(-7).ToShortTimeString());
+                return;
+            }
+
+            if (balloonDocument.State == BalloonState.Landed)
+            {
+                log.LogInformation($"Balloon not in the air, no prediction calculated");
 
                 // TEST CODE
 
@@ -76,10 +84,13 @@ namespace WeatherBalloon.Cloud
                     FlightId = balloonDocument.FlightId,
                     TrackerSource = balloonDocument.TrackerSource,
                     Geopoint = new Point(balloonDocument.Longitude, balloonDocument.Latitude),
-                    partitionid = balloonDocument.partitionid
+                    Latitude = balloonDocument.Latitude,
+                    Longitude = balloonDocument.Longitude,
+                    partitionid = balloonDocument.partitionid, 
+                    LandingDateTime = DateTime.UtcNow
                 };
 
-                var predictionNotification = new PredictionNotification(new PredictionDocument());
+                var predictionNotification = new PredictionNotification(fakePrediction, balloonDocument.Latitude, balloonDocument.Longitude);
 
                 SendPredictionNotification(predictionNotification);
                 return;
@@ -98,7 +109,7 @@ namespace WeatherBalloon.Cloud
                 balloonDocument.BurstAltitude = 30000;
             }
 
-            if (balloonDocument.State == BalloonState.Rising)
+            if ((balloonDocument.State == BalloonState.Rising) || (balloonDocument.State == BalloonState.PreLaunch))
             {
                 try 
                 {
@@ -117,7 +128,7 @@ namespace WeatherBalloon.Cloud
 
                         try
                         {
-                            var predictionNotification = new PredictionNotification(predictionDocument);
+                            var predictionNotification = new PredictionNotification(predictionDocument, balloonDocument.Latitude, balloonDocument.Longitude);
 
                             SendPredictionNotification(predictionNotification);
                         }
@@ -141,7 +152,7 @@ namespace WeatherBalloon.Cloud
                 {
                     lastPredictionDocument.DistanceToLanding = 10; // todo
 
-                    var notification = new PredictionNotification(lastPredictionDocument);
+                    var notification = new PredictionNotification(lastPredictionDocument, balloonDocument.Latitude, balloonDocument.Longitude);
 
                     // notify of balloon location
                     SendPredictionNotification(notification);
@@ -171,11 +182,18 @@ namespace WeatherBalloon.Cloud
         /// <returns></returns>
         private static void SendPredictionNotification(PredictionNotification predictionNotification)
         {
-            // todo - put this in the app properties
-            var url = $"https://habservices.azurewebsites.net/api/HttpToSMSNotification?code={SMSNotificationFunctionKey}";
-            var body = JsonConvert.SerializeObject(predictionNotification);
+            var recipientList = SMSRecipients.Split(',').ToList();
+
+            foreach (var recipient in recipientList)
+            {
+                predictionNotification.ToPhoneNumber = recipient;
+             
+                // todo - put this in the app properties
+                var url = $"https://balloonservices.azurewebsites.net/api/HttpToSMSNotification?code={SMSNotificationFunctionKey}";
+                var body = JsonConvert.SerializeObject(predictionNotification);
             
-            client.PostAsJsonAsync(url, body);
+                client.PostAsJsonAsync(url, body).Wait();
+            }
         }
 
         /// <summary>

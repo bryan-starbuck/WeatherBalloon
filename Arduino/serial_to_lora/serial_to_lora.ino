@@ -105,9 +105,9 @@ void setup()
   Serial.print("-Set Freq to: "); 
   Serial.println(RF95_FREQ);
   
-  rf95.setSignalBandwidth(62500);
+  rf95.setSignalBandwidth(125000);
   rf95.setCodingRate4(1);
-  rf95.setSpreadingFactor(10);
+  rf95.setSpreadingFactor(8);
    
   //rf95.setModemConfig(RH_RF95::Bw125Cr48Sf4096);  //set for pre-configured long range
   rf95.setTxPower(20);  //set for 100mw
