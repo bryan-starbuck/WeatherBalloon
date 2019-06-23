@@ -1,4 +1,4 @@
-![alt text](altitude.png "Launch")
+![alt text](altitude.PNG "Launch")
 
 WE DID IT! Launched 06/15/2019, successfully tracked balloon at 100,000 feet. 
 
